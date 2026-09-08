@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import SidebarNav from '@/components/layout/SidebarNav'
 import NavbarTop from '@/components/layout/NavbarTop'
+import Logo from '@/components/ui/Logo'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: 'home' },
@@ -225,8 +226,7 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-gray-50">
       <aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-blue-900 text-white">
         <div className="flex items-center gap-2 px-6 py-6">
-          <Icon name="heart" className="w-7 h-7" />
-          <span className="text-xl font-bold">VidaRecord</span>
+          <Logo theme="dark" iconClassName="h-9 w-9" textClassName="text-xl" />
         </div>
 
         <SidebarNav

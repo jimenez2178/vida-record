@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import Logo from '@/components/ui/Logo'
 
 export default function ForgotPasswordPage() {
   const supabase = createClient()
@@ -34,13 +35,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
       <div className="flex flex-col items-center mb-6">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo.jpg"
-          alt="VidaRecord"
-          className="h-24 w-auto mx-auto"
-          style={{ mixBlendMode: 'multiply' }}
-        />
+        <Logo iconClassName="h-16 w-16" textClassName="text-3xl" />
         <p className="text-gray-500 text-sm mt-2 text-center">
           Recuperar contraseña
         </p>
