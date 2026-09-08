@@ -15,7 +15,7 @@ export default async function ResumenPdfPage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'id, full_name, date_of_birth, blood_type, allergies, emergency_contact_name, emergency_contact_phone'
+      'id, full_name, date_of_birth, blood_type, allergies, medical_notes, emergency_contact_name, emergency_contact_phone'
     )
     .eq('user_id', user.id)
     .eq('is_owner', true)

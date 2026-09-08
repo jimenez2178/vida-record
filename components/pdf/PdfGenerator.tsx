@@ -10,6 +10,7 @@ type Profile = {
   date_of_birth: string | null
   blood_type: string | null
   allergies: string | null
+  medical_notes: string | null
   emergency_contact_name: string | null
   emergency_contact_phone: string | null
 }
@@ -209,6 +210,7 @@ export default function PdfGenerator({
         `Fecha de nacimiento: ${formatDate(profile.date_of_birth) || 'No especificada'}`,
         `Tipo de sangre: ${profile.blood_type || 'No especificado'}`,
         `Alergias: ${profile.allergies || 'Ninguna registrada'}`,
+        `Notas médicas importantes: ${profile.medical_notes || 'Ninguna'}`,
         `Contacto de emergencia: ${
           profile.emergency_contact_name
             ? `${profile.emergency_contact_name}${
@@ -463,6 +465,10 @@ export default function PdfGenerator({
                   </p>
                   <p>Tipo de sangre: {profile.blood_type || 'No especificado'}</p>
                   <p>Alergias: {profile.allergies || 'Ninguna registrada'}</p>
+                  <p>
+                    Notas médicas importantes:{' '}
+                    {profile.medical_notes || 'Ninguna'}
+                  </p>
                   <p>
                     Contacto de emergencia:{' '}
                     {profile.emergency_contact_name
