@@ -9,6 +9,7 @@ const navItems = [
   { href: '/citas', label: 'Citas', icon: 'building' },
   { href: '/medicamentos', label: 'Medicamentos', icon: 'pill' },
   { href: '/estudios', label: 'Estudios', icon: 'beaker' },
+  { href: '/diagnosticos', label: 'Diagnósticos', icon: 'clipboard' },
   { href: '/indicadores', label: 'Indicadores', icon: 'chart' },
   { href: '/medicos', label: 'Médicos', icon: 'stethoscope' },
   { href: '/resumen-pdf', label: 'Resumen PDF', icon: 'document' },
@@ -28,6 +29,7 @@ type IconName =
   | 'building'
   | 'pill'
   | 'beaker'
+  | 'clipboard'
   | 'chart'
   | 'stethoscope'
   | 'document'
@@ -80,6 +82,20 @@ function Icon({
         strokeLinejoin="round"
         d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5.106 14.4c-1.6 1.6-.464 4.35 1.804 4.35h10.18c2.268 0 3.404-2.75 1.804-4.35l-3.985-3.99a2.25 2.25 0 01-.659-1.591V3.104M8.25 3.104h7.5"
       />
+    ),
+    clipboard: (
+      <>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3a2.25 2.25 0 00-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75h-6a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9 12.75h6m-6 3.75h6"
+        />
+      </>
     ),
     chart: (
       <path
