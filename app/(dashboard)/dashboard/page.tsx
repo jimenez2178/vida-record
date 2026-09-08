@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import QuickActions from '@/components/dashboard/QuickActions'
 
@@ -263,13 +262,6 @@ export default async function DashboardPage() {
         <h2 className="text-gray-800 font-semibold mb-3">Acciones rápidas</h2>
         <QuickActions profileId={profile.id} userId={user.id} />
       </section>
-
-      <Link
-        href="/resumen-pdf"
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full shadow-lg px-5 py-3 transition-colors"
-      >
-        📄 Resumen PDF
-      </Link>
     </div>
   )
 }
