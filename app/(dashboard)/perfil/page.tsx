@@ -40,7 +40,7 @@ export default async function PerfilPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
-      <ProfileForm profile={profile} />
+      <ProfileForm profile={profile} email={user.email ?? ''} />
     </div>
   )
 }

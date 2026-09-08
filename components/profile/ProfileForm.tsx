@@ -34,7 +34,19 @@ const bloodTypeOptions = [
   'No sé',
 ]
 
-export default function ProfileForm({ profile }: { profile: Profile }) {
+function isNameFromEmail(fullName: string, email: string) {
+  if (!fullName || !email) return false
+  const username = email.split('@')[0]
+  return fullName.trim().toLowerCase() === username.trim().toLowerCase()
+}
+
+export default function ProfileForm({
+  profile,
+  email,
+}: {
+  profile: Profile
+  email: string
+}) {
   const supabase = createClient()
 
   const [fullName, setFullName] = useState(profile.full_name ?? '')
@@ -89,12 +101,21 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
     setSuccess(true)
   }
 
+  const showEmailNameWarning = isNameFromEmail(fullName, email)
+
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-800">Mi perfil médico</h1>
       <p className="text-gray-500 mt-1 mb-6">
         Esta información aparece en tu resumen médico PDF
       </p>
+
+      {showEmailNameWarning && (
+        <div className="mb-4 text-sm text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+          ⚠️ Tu nombre aparece como usuario de email. Actualízalo aquí para
+          que aparezca correctamente en tu resumen PDF.
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">

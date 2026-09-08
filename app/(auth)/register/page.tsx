@@ -24,6 +24,11 @@ export default function RegisterPage() {
     setError('')
     setMessage('')
 
+    if (fullName.trim().length < 3) {
+      setError('El nombre completo debe tener al menos 3 caracteres.')
+      return
+    }
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.')
       return
@@ -35,7 +40,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName.trim() },
         emailRedirectTo: `${window.location.origin}/login`,
       },
     })
