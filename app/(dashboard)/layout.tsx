@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import SidebarNav from '@/components/layout/SidebarNav'
 import NavbarTop from '@/components/layout/NavbarTop'
 import Logo from '@/components/ui/Logo'
+import InstallPWA from '@/components/pwa/InstallPWA'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: 'home' },
@@ -285,6 +286,8 @@ export default async function DashboardLayout({
       >
         🤖 Asistente IA
       </Link>
+
+      <InstallPWA />
     </div>
   )
 }

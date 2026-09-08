@@ -41,7 +41,7 @@ const targets = [
   { file: path.join(iconsDir, 'icon-192.png'), size: 192 },
   { file: path.join(iconsDir, 'icon-512.png'), size: 512 },
   { file: path.join(iconsDir, 'icon-512-maskable.png'), size: 512 },
-  { file: path.join(appDir, 'apple-icon.png'), size: 180 },
+  { file: path.join(iconsDir, 'apple-touch-icon.png'), size: 180 },
 ]
 
 for (const { file, size } of targets) {
