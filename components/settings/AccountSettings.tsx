@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import PayPalButton from './PayPalButton'
 
 type User = {
   id: string
@@ -33,7 +34,11 @@ export default function AccountSettings({
   profile: Profile
 }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  const upgraded = searchParams.get('upgraded') === 'true'
+  const cancelled = searchParams.get('cancelled') === 'true'
 
   const initial = profile.full_name.trim().charAt(0).toUpperCase() || '?'
 
@@ -80,6 +85,18 @@ export default function AccountSettings({
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Configuración</h1>
+
+      {upgraded && (
+        <div className="mb-6 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+          🎉 ¡Bienvenido a Premium! Tu cuenta ha sido actualizada.
+        </div>
+      )}
+
+      {cancelled && (
+        <div className="mb-6 text-sm text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+          El pago fue cancelado. Puedes intentarlo de nuevo.
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
         <section className="p-6">
@@ -141,13 +158,9 @@ export default function AccountSettings({
                 <li>✗ Sin asistente IA</li>
                 <li>✗ Sin perfiles familiares</li>
               </ul>
-              <button
-                type="button"
-                onClick={handleUpgrade}
-                className="w-full mt-5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg py-3 transition-colors"
-              >
-                Actualizar a Premium — $3.99/mes
-              </button>
+              <div className="mt-5">
+                <PayPalButton />
+              </div>
             </div>
           )}
         </section>
