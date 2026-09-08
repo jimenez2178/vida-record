@@ -444,7 +444,8 @@ export default function PdfGenerator({
 
         <div className="bg-white rounded-xl shadow-sm p-6 md:p-8">
           <div className="border-b-2 border-blue-700 pb-4 mb-6">
-            <p className="text-2xl font-bold text-blue-700">VidaRecord</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.jpg" alt="VidaRecord" className="h-12 w-auto" />
             <p className="text-gray-600 mt-1">Resumen Médico Personal</p>
             <p className="text-xs text-gray-400 mt-2">
               Generado el {todayLabel}

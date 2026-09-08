@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import SidebarNav from '@/components/layout/SidebarNav'
+import NavbarTop from '@/components/layout/NavbarTop'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: 'home' },
@@ -203,6 +204,14 @@ export default async function DashboardLayout({
     user.email?.split('@')[0] ||
     'Usuario'
 
+  const { data: userRow } = await supabase
+    .from('users')
+    .select('plan')
+    .eq('id', user.id)
+    .single()
+
+  const plan = (userRow?.plan as 'free' | 'premium' | undefined) ?? 'free'
+
   return (
     <div className="min-h-screen bg-gray-50">
       <aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-blue-900 text-white">
@@ -220,6 +229,14 @@ export default async function DashboardLayout({
         />
 
         <div className="px-3 py-4 border-t border-blue-800">
+          <Link
+            href="/configuracion"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/90 hover:bg-blue-800 transition-colors mb-1"
+          >
+            <Icon name="settings" />
+            Configuración
+          </Link>
+
           <p className="px-3 pb-2 text-sm text-white/80 truncate">
             {displayName}
           </p>
@@ -248,7 +265,10 @@ export default async function DashboardLayout({
         ))}
       </nav>
 
-      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen">{children}</main>
+      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen flex flex-col">
+        <NavbarTop plan={plan} />
+        <div className="flex-1">{children}</div>
+      </main>
     </div>
   )
 }

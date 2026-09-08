@@ -30,28 +30,28 @@ export default function QuickActions({
         <button
           type="button"
           onClick={() => setOpenModal('cita')}
-          className="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm py-3 px-4 text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
         >
           + Nueva consulta
         </button>
         <button
           type="button"
           onClick={() => setOpenModal('medicamento')}
-          className="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm py-3 px-4 text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
         >
           + Medicamento
         </button>
         <button
           type="button"
           onClick={() => setOpenModal('estudio')}
-          className="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm py-3 px-4 text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
         >
           + Estudio
         </button>
         <button
           type="button"
           onClick={() => setOpenModal('medicion')}
-          className="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm py-3 px-4 text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
         >
           + Medición
         </button>

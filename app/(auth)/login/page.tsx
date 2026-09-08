@@ -38,20 +38,13 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
       <div className="flex flex-col items-center mb-6">
-        <div className="flex items-center gap-2 text-blue-700">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-7 h-7"
-          >
-            <path d="M12 21s-6.716-4.35-9.428-8.243C.29 9.516 1.13 5.6 4.5 4.257c2.02-.805 4.14-.09 5.5 1.53C11.36 4.167 13.48 3.452 15.5 4.257c3.37 1.343 4.21 5.259 1.928 8.5C18.716 16.65 12 21 12 21z" />
-          </svg>
-          <span className="text-2xl font-bold">VidaRecord</span>
-        </div>
-        <p className="text-gray-500 text-sm mt-2 text-center">
-          Tu historial médico. Siempre contigo.
-        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo.jpg"
+          alt="VidaRecord"
+          className="h-24 w-auto mx-auto"
+          style={{ mixBlendMode: 'multiply' }}
+        />
       </div>
 
       {error && (
