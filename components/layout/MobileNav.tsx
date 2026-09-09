@@ -109,6 +109,21 @@ export default function MobileNav({
 
         <SidebarNav links={links} onLinkClick={() => setOpen(false)} />
 
+        {plan === 'free' && (
+          <div className="px-3 pb-3">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false)
+                router.push('/configuracion')
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-orange-400 hover:bg-orange-500 text-white text-sm font-semibold rounded-xl py-3 transition-colors"
+            >
+              ⭐ Pasar a Premium
+            </button>
+          </div>
+        )}
+
         <div className="px-3 py-4 border-t border-blue-800">
           <button
             type="button"
