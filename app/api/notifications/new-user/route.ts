@@ -1,50 +1,4 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
-
-function buildWelcomeEmailHtml(name: string) {
-  return `
-<div style="background-color:#f3f4f6;padding:40px 16px;font-family:Arial, Helvetica, sans-serif;">
-  <div style="max-width:480px;margin:0 auto;background-color:#ffffff;border-radius:16px;padding:40px 32px;">
-    <p style="font-size:28px;font-weight:bold;color:#1e3a8a;margin:0 0 24px;text-align:center;">
-      💙 VidaRecord
-    </p>
-
-    <h1 style="font-size:20px;font-weight:bold;color:#1f2937;margin:0 0 16px;text-align:center;">
-      ¡Hola, ${name}! Bienvenido a VidaRecord
-    </h1>
-
-    <p style="font-size:14px;color:#4b5563;line-height:1.6;margin:0 0 24px;">
-      Tu historial médico ya tiene un nuevo hogar. Ahora puedes organizar tus citas, medicamentos, estudios y documentos médicos en un solo lugar.
-    </p>
-
-    <ul style="list-style:none;padding:0;margin:0 0 32px;">
-      <li style="font-size:14px;color:#374151;margin-bottom:12px;">📅 Registrar tus consultas médicas</li>
-      <li style="font-size:14px;color:#374151;margin-bottom:12px;">💊 Controlar tus medicamentos</li>
-      <li style="font-size:14px;color:#374151;margin-bottom:12px;">🧪 Guardar tus estudios y resultados</li>
-      <li style="font-size:14px;color:#374151;margin-bottom:0;">📄 Generar tu resumen médico PDF</li>
-    </ul>
-
-    <div style="text-align:center;margin-bottom:32px;">
-      <a
-        href="https://vida-record.vercel.app/dashboard"
-        style="display:inline-block;background-color:#1d4ed8;color:#ffffff;font-size:16px;font-weight:bold;padding:14px 32px;border-radius:10px;text-decoration:none;"
-      >
-        Ir a mi cuenta
-      </a>
-    </div>
-
-    <p style="font-size:12px;color:#9ca3af;text-align:center;margin:0 0 4px;">
-      VidaRecord — Tu historial médico. Siempre contigo.
-    </p>
-    <p style="font-size:12px;color:#9ca3af;text-align:center;margin:0;">
-      Desarrollado por Nexus Digital — Santo Domingo, RD
-    </p>
-  </div>
-</div>
-`
-}
 
 function buildTelegramMessage(name: string, email: string) {
   const formattedDate = new Date().toLocaleString('es-ES', {
@@ -72,18 +26,6 @@ export async function POST(request: Request) {
       { error: 'email y name son requeridos' },
       { status: 400 }
     )
-  }
-
-  try {
-    const result = await resend.emails.send({
-      from: 'VidaRecord <onboarding@resend.dev>',
-      to: email,
-      subject: '¡Bienvenido a VidaRecord! 🩺',
-      html: buildWelcomeEmailHtml(name),
-    })
-    console.log('RESEND RESULT:', JSON.stringify(result))
-  } catch (error) {
-    console.error('RESEND ERROR:', JSON.stringify(error))
   }
 
   try {
