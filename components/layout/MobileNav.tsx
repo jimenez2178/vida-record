@@ -12,12 +12,23 @@ type NavLink = {
   icon: React.ReactNode
 }
 
+type FamilyProfile = {
+  id: string
+  full_name: string
+}
+
 export default function MobileNav({
   links,
   plan,
+  profiles,
+  activeProfileId,
+  userId,
 }: {
   links: NavLink[]
   plan: 'free' | 'premium'
+  profiles?: FamilyProfile[]
+  activeProfileId?: string | null
+  userId?: string
 }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -107,7 +118,14 @@ export default function MobileNav({
           </button>
         </div>
 
-        <SidebarNav links={links} onLinkClick={() => setOpen(false)} />
+        <SidebarNav
+          links={links}
+          onLinkClick={() => setOpen(false)}
+          profiles={profiles}
+          activeProfileId={activeProfileId}
+          userId={userId}
+          plan={plan}
+        />
 
         {plan === 'free' && (
           <div className="px-3 pb-3">

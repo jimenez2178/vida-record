@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveProfileId } from '@/lib/profiles/getActiveProfileId'
 import PremiumGate from '@/components/ui/PremiumGate'
 import AssistantChat from '@/components/ai/AssistantChat'
 
@@ -13,14 +14,9 @@ export default async function AsistentePage() {
     return null
   }
 
-  const [{ data: userRow }, { data: profile }] = await Promise.all([
+  const [{ data: userRow }, profileId] = await Promise.all([
     supabase.from('users').select('plan').eq('id', user.id).single(),
-    supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('is_owner', true)
-      .single(),
+    getActiveProfileId(supabase, user.id),
   ])
 
   if (userRow?.plan !== 'premium') {
@@ -34,7 +30,7 @@ export default async function AsistentePage() {
     )
   }
 
-  if (!profile) {
+  if (!profileId) {
     return (
       <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
         <div className="bg-white rounded-xl shadow-sm p-8 text-center max-w-md mx-auto">
@@ -53,7 +49,7 @@ export default async function AsistentePage() {
 
   return (
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
-      <AssistantChat profileId={profile.id} userId={user.id} />
+      <AssistantChat profileId={profileId} userId={user.id} />
     </div>
   )
 }

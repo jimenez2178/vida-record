@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveProfileId } from '@/lib/profiles/getActiveProfileId'
 import AppointmentsList from '@/components/appointments/AppointmentsList'
 
 export default async function CitasPage() {
@@ -12,14 +13,9 @@ export default async function CitasPage() {
     return null
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('is_owner', true)
-    .single()
+  const profileId = await getActiveProfileId(supabase, user.id)
 
-  if (!profile) {
+  if (!profileId) {
     return (
       <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
         <div className="bg-white rounded-xl shadow-sm p-8 text-center max-w-md mx-auto">
@@ -38,7 +34,7 @@ export default async function CitasPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
-      <AppointmentsList profileId={profile.id} userId={user.id} />
+      <AppointmentsList profileId={profileId} userId={user.id} />
     </div>
   )
 }

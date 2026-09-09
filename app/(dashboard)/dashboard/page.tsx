@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveProfileId } from '@/lib/profiles/getActiveProfileId'
 import QuickActions from '@/components/dashboard/QuickActions'
 import DashboardGreeting from '@/components/dashboard/DashboardGreeting'
 
@@ -73,14 +74,9 @@ export default async function DashboardPage() {
     return null
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('is_owner', true)
-    .single()
+  const profileId = await getActiveProfileId(supabase, user.id)
 
-  if (!profile) {
+  if (!profileId) {
     return (
       <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
         <div className="bg-white rounded-xl shadow-sm p-8 text-center max-w-md mx-auto">
@@ -111,7 +107,7 @@ export default async function DashboardPage() {
     supabase
       .from('appointments')
       .select('id, date, specialty, doctors ( name )')
-      .eq('profile_id', profile.id)
+      .eq('profile_id', profileId)
       .eq('status', 'programada')
       .gte('date', todayDateString())
       .order('date', { ascending: true })
@@ -120,20 +116,20 @@ export default async function DashboardPage() {
     supabase
       .from('medications')
       .select('name', { count: 'exact' })
-      .eq('profile_id', profile.id)
+      .eq('profile_id', profileId)
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(3),
     supabase
       .from('studies')
       .select('id, name, type, date')
-      .eq('profile_id', profile.id)
+      .eq('profile_id', profileId)
       .order('created_at', { ascending: false })
       .limit(2),
     supabase
       .from('health_indicators')
       .select('type, value_primary, value_secondary, unit')
-      .eq('profile_id', profile.id)
+      .eq('profile_id', profileId)
       .order('measured_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -239,7 +235,7 @@ export default async function DashboardPage() {
 
       <section className="mb-8">
         <h2 className="text-gray-800 font-semibold mb-3">Acciones rápidas</h2>
-        <QuickActions profileId={profile.id} userId={user.id} />
+        <QuickActions profileId={profileId} userId={user.id} />
       </section>
     </div>
   )
