@@ -36,6 +36,7 @@ export default function AppointmentModal({
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [showMoreOptions, setShowMoreOptions] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -142,51 +143,17 @@ export default function AppointmentModal({
           onSubmit={handleSubmit}
           className="flex flex-col flex-1 overflow-hidden"
         >
-          <div className="overflow-y-auto px-6 py-5 space-y-4 flex-1">
+          <div className="overflow-y-auto px-6 py-5 space-y-5 flex-1">
             {error && (
               <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                 {error}
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="date"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Fecha
-                </label>
-                <input
-                  id="date"
-                  type="date"
-                  required
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="time"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Hora
-                </label>
-                <input
-                  id="time"
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                />
-              </div>
-            </div>
-
             <div>
               <label
                 htmlFor="specialty"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-base font-semibold text-gray-700 mb-1.5"
               >
                 Especialidad
               </label>
@@ -197,142 +164,201 @@ export default function AppointmentModal({
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
                 placeholder="Ej: Cardiología, Urología, Medicina interna"
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="doctorName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Médico
-                </label>
-                <input
-                  id="doctorName"
-                  type="text"
-                  value={doctorName}
-                  onChange={(e) => setDoctorName(e.target.value)}
-                  placeholder="Nombre del médico"
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="clinicName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Centro médico
-                </label>
-                <input
-                  id="clinicName"
-                  type="text"
-                  value={clinicName}
-                  onChange={(e) => setClinicName(e.target.value)}
-                  placeholder="Nombre del centro o clínica"
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="reason"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Motivo de consulta
-              </label>
-              <textarea
-                id="reason"
-                rows={3}
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
             <div>
               <label
-                htmlFor="diagnosis"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="date"
+                className="block text-base font-semibold text-gray-700 mb-1.5"
               >
-                Diagnóstico recibido
+                Fecha
               </label>
-              <textarea
-                id="diagnosis"
-                rows={3}
-                value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+              <input
+                id="date"
+                type="date"
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
               />
             </div>
 
             <div>
               <label
-                htmlFor="notes"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="doctorName"
+                className="block text-base font-semibold text-gray-700 mb-1.5"
               >
-                Notas personales
+                Médico
               </label>
-              <textarea
-                id="notes"
-                rows={2}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+              <input
+                id="doctorName"
+                type="text"
+                value={doctorName}
+                onChange={(e) => setDoctorName(e.target.value)}
+                placeholder="Nombre del médico"
+                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="nextAppointmentDate"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Próxima cita recomendada
-                </label>
-                <input
-                  id="nextAppointmentDate"
-                  type="date"
-                  value={nextAppointmentDate}
-                  onChange={(e) => setNextAppointmentDate(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Estado
-                </label>
-                <select
-                  id="status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                >
-                  <option value="programada">Programada</option>
-                  <option value="completada">Completada</option>
-                  <option value="cancelada">Cancelada</option>
-                </select>
-              </div>
+            <div>
+              <label
+                htmlFor="status"
+                className="block text-base font-semibold text-gray-700 mb-1.5"
+              >
+                Estado
+              </label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
+                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
+              >
+                <option value="programada">Programada</option>
+                <option value="completada">Completada</option>
+                <option value="cancelada">Cancelada</option>
+              </select>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setShowMoreOptions((v) => !v)}
+              className="flex items-center gap-1.5 text-blue-600 text-sm font-medium bg-transparent border-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  showMoreOptions ? 'rotate-180' : ''
+                }`}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+              {showMoreOptions ? 'Ver menos opciones' : '+ Ver más opciones'}
+            </button>
+
+            {showMoreOptions && (
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="time"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Hora
+                  </label>
+                  <input
+                    id="time"
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="clinicName"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Centro médico
+                  </label>
+                  <input
+                    id="clinicName"
+                    type="text"
+                    value={clinicName}
+                    onChange={(e) => setClinicName(e.target.value)}
+                    placeholder="Nombre del centro o clínica"
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reason"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Motivo de consulta
+                  </label>
+                  <textarea
+                    id="reason"
+                    rows={3}
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="diagnosis"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Diagnóstico recibido
+                  </label>
+                  <textarea
+                    id="diagnosis"
+                    rows={3}
+                    value={diagnosis}
+                    onChange={(e) => setDiagnosis(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="notes"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Notas personales
+                  </label>
+                  <textarea
+                    id="notes"
+                    rows={2}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="nextAppointmentDate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Próxima cita recomendada
+                  </label>
+                  <input
+                    id="nextAppointmentDate"
+                    type="date"
+                    value={nextAppointmentDate}
+                    onChange={(e) => setNextAppointmentDate(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full sm:w-auto min-h-[56px] px-4 py-4 text-lg font-bold text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors"
+              className="w-full sm:w-auto min-h-[56px] bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-lg font-bold rounded-xl px-5 py-4 transition-colors"
             >
               {saving ? 'Guardando...' : 'Guardar consulta'}
             </button>

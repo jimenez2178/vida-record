@@ -1,22 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import QuickActions from '@/components/dashboard/QuickActions'
-
-function getGreeting() {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Buenos días'
-  if (hour < 19) return 'Buenas tardes'
-  return 'Buenas noches'
-}
-
-function getTodayLabel() {
-  const label = new Date().toLocaleDateString('es-ES', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-  return label.charAt(0).toUpperCase() + label.slice(1)
-}
+import DashboardGreeting from '@/components/dashboard/DashboardGreeting'
 
 function todayDateString() {
   const now = new Date()
@@ -163,12 +147,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {getGreeting()}, {displayName} 👋
-        </h1>
-        <p className="text-gray-500 mt-1">{getTodayLabel()}</p>
-      </header>
+      <DashboardGreeting displayName={displayName} />
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-teal-600 text-white rounded-xl shadow-sm p-6">

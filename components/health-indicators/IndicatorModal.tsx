@@ -40,6 +40,7 @@ export default function IndicatorModal({
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [showMoreOptions, setShowMoreOptions] = useState(false)
 
   const handleTypeChange = (newType: IndicatorType) => {
     setType(newType)
@@ -128,7 +129,7 @@ export default function IndicatorModal({
           onSubmit={handleSubmit}
           className="flex flex-col flex-1 overflow-hidden"
         >
-          <div className="overflow-y-auto px-6 py-5 space-y-4 flex-1">
+          <div className="overflow-y-auto px-6 py-5 space-y-5 flex-1">
             {error && (
               <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                 {error}
@@ -138,7 +139,7 @@ export default function IndicatorModal({
             <div>
               <label
                 htmlFor="type"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-base font-semibold text-gray-700 mb-1.5"
               >
                 Tipo de indicador
               </label>
@@ -149,7 +150,7 @@ export default function IndicatorModal({
                 onChange={(e) =>
                   handleTypeChange(e.target.value as IndicatorType)
                 }
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
               >
                 {indicatorOrder.map((t) => (
                   <option key={t} value={t}>
@@ -164,7 +165,7 @@ export default function IndicatorModal({
                 <div>
                   <label
                     htmlFor="valuePrimary"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-base font-semibold text-gray-700 mb-1.5"
                   >
                     Sistólica
                   </label>
@@ -175,13 +176,13 @@ export default function IndicatorModal({
                     value={valuePrimary}
                     onChange={(e) => setValuePrimary(e.target.value)}
                     placeholder="128"
-                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
+                    className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900 placeholder:text-gray-400"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="valueSecondary"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-base font-semibold text-gray-700 mb-1.5"
                   >
                     Diastólica
                   </label>
@@ -192,7 +193,7 @@ export default function IndicatorModal({
                     value={valueSecondary}
                     onChange={(e) => setValueSecondary(e.target.value)}
                     placeholder="82"
-                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
+                    className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900 placeholder:text-gray-400"
                   />
                 </div>
               </div>
@@ -200,7 +201,7 @@ export default function IndicatorModal({
               <div>
                 <label
                   htmlFor="valuePrimary"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-base font-semibold text-gray-700 mb-1.5"
                 >
                   Valor
                 </label>
@@ -210,74 +211,101 @@ export default function IndicatorModal({
                   required
                   value={valuePrimary}
                   onChange={(e) => setValuePrimary(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
                 />
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="unit"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Unidad
-                </label>
-                <input
-                  id="unit"
-                  type="text"
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="measuredAt"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Fecha y hora
-                </label>
-                <input
-                  id="measuredAt"
-                  type="datetime-local"
-                  required
-                  value={measuredAt}
-                  onChange={(e) => setMeasuredAt(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                />
-              </div>
-            </div>
-
             <div>
               <label
-                htmlFor="notes"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="unit"
+                className="block text-base font-semibold text-gray-700 mb-1.5"
               >
-                Notas
+                Unidad
               </label>
-              <textarea
-                id="notes"
-                rows={2}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+              <input
+                id="unit"
+                type="text"
+                value={unit}
+                readOnly
+                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3 text-lg text-gray-600"
               />
             </div>
+
+            <button
+              type="button"
+              onClick={() => setShowMoreOptions((v) => !v)}
+              className="flex items-center gap-1.5 text-blue-600 text-sm font-medium bg-transparent border-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  showMoreOptions ? 'rotate-180' : ''
+                }`}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+              {showMoreOptions ? 'Ver menos opciones' : '+ Ver más opciones'}
+            </button>
+
+            {showMoreOptions && (
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="measuredAt"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Fecha y hora
+                  </label>
+                  <input
+                    id="measuredAt"
+                    type="datetime-local"
+                    required
+                    value={measuredAt}
+                    onChange={(e) => setMeasuredAt(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="notes"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Notas
+                  </label>
+                  <textarea
+                    id="notes"
+                    rows={2}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full sm:w-auto min-h-[56px] px-4 py-4 text-lg font-bold text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors"
+              className="w-full sm:w-auto min-h-[56px] bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-lg font-bold rounded-xl px-5 py-4 transition-colors"
             >
               {saving ? 'Guardando...' : 'Guardar medición'}
             </button>
