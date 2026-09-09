@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export type StudyType = 'laboratorio' | 'imagen' | 'receta' | 'otro'
@@ -91,18 +92,55 @@ export default function StudyCard({
   study,
   onEdit,
   onDelete,
+  isPremium,
 }: {
   study: Study
   onEdit: (study: Study) => void
   onDelete: (id: string) => void
+  isPremium: boolean
 }) {
   const supabase = createClient()
   const [menuOpen, setMenuOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [opening, setOpening] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState('')
+  const [aiProcessed, setAiProcessed] = useState(study.ai_processed)
+  const [aiSummary, setAiSummary] = useState(study.ai_summary)
 
   const config = typeConfig[study.type ?? 'otro']
   const date = formatDate(study.date)
+
+  const handleAnalyze = async () => {
+    if (!study.file_url) return
+
+    setAnalyzing(true)
+    setAnalyzeError('')
+
+    try {
+      const res = await fetch('/api/ai/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studyId: study.id, fileUrl: study.file_url }),
+      })
+
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok || !data?.summary) {
+        setAnalyzeError(
+          data?.error ?? 'No se pudo analizar el documento. Intenta de nuevo.'
+        )
+        return
+      }
+
+      setAiSummary(data.summary)
+      setAiProcessed(true)
+    } catch {
+      setAnalyzeError('No se pudo analizar el documento. Intenta de nuevo.')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   const handleViewFile = async () => {
     if (!study.file_url) return
@@ -258,12 +296,81 @@ export default function StudyCard({
           </button>
         )}
 
-        {study.ai_processed && (
+        {study.file_url && isPremium && aiProcessed && (
           <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 rounded-full px-2.5 py-1">
-            Analizado por IA
+            ✅ Analizado por IA
           </span>
         )}
+
+        {study.file_url && isPremium && !aiProcessed && (
+          <button
+            type="button"
+            onClick={handleAnalyze}
+            disabled={analyzing}
+            className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-2 text-sm font-medium disabled:opacity-60 transition-colors"
+          >
+            {analyzing ? (
+              <>
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+                Analizando...
+              </>
+            ) : (
+              '🤖 Analizar con IA'
+            )}
+          </button>
+        )}
+
+        {study.file_url && !isPremium && (
+          <Link
+            href="/configuracion"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 transition-colors"
+          >
+            🔒 Análisis IA — Solo Premium
+          </Link>
+        )}
       </div>
+
+      {analyzeError && (
+        <p className="text-xs text-red-600 mt-2">{analyzeError}</p>
+      )}
+
+      {study.file_url && isPremium && aiProcessed && aiSummary && (
+        <div className="bg-blue-50 rounded-lg p-3 mt-2">
+          <p className="text-xs font-bold text-gray-700 mb-1">
+            📋 Resumen IA:
+          </p>
+          <p className="text-sm text-gray-700 whitespace-pre-line">
+            {aiSummary}
+          </p>
+          <button
+            type="button"
+            onClick={handleAnalyze}
+            disabled={analyzing}
+            className="mt-2 text-xs font-medium text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-60 rounded-lg px-2.5 py-1 transition-colors"
+          >
+            {analyzing ? 'Analizando...' : 'Volver a analizar'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

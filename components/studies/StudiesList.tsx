@@ -25,7 +25,7 @@ export default function StudiesList({
   userId: string
 }) {
   const supabase = createClient()
-  const { canAdd, refetch: refetchPlan } = usePlan()
+  const { isPremium, canAdd, refetch: refetchPlan } = usePlan()
 
   const [studies, setStudies] = useState<Study[]>([])
   const [loading, setLoading] = useState(true)
@@ -152,6 +152,7 @@ export default function StudiesList({
               study={study}
               onEdit={openEditModal}
               onDelete={handleDelete}
+              isPremium={isPremium}
             />
           ))}
         </div>
