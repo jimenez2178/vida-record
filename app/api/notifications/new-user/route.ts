@@ -67,13 +67,6 @@ export async function POST(request: Request) {
   const email = body?.email
   const name = body?.name
 
-  console.log('NOTIFICATION ENDPOINT CALLED', { email, name })
-  console.log('ENV CHECK:', {
-    hasResend: !!process.env.RESEND_API_KEY,
-    hasTelegram: !!process.env.TELEGRAM_BOT_TOKEN,
-    chatId: process.env.TELEGRAM_CHAT_ID,
-  })
-
   if (!email || typeof email !== 'string' || !name || typeof name !== 'string') {
     return NextResponse.json(
       { error: 'email y name son requeridos' },
