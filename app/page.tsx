@@ -179,9 +179,10 @@ export default function Home() {
               <div className="relative w-full max-w-lg">
                 <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-teal-400 to-blue-400 opacity-30 blur-lg" />
                 <img
-                  src="https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=800&q=80"
-                  alt="Señora mayor atendida en consulta médica con calidez"
+                  src="/hero-landing.jpg"
+                  alt="Señora mostrando su historial médico en el celular a su médico durante una consulta"
                   className="relative w-full h-auto object-cover rounded-2xl shadow-2xl border-4 border-white/10"
+                  loading="eager"
                 />
                 <div className="absolute -bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-slate-100 hidden sm:flex items-center gap-4 text-slate-800">
                   <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
