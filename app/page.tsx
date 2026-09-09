@@ -133,7 +133,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white">
-                ¿Recuerdas todos los medicamentos que tomas?
+                ¿Recuerdas todo lo que tu médico necesita saber de ti?
               </h1>
 
               <p className="text-slate-100 text-lg sm:text-xl font-normal leading-relaxed max-w-2xl mx-auto lg:mx-0">
