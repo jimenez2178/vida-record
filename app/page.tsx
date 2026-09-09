@@ -28,13 +28,43 @@ const problems = [
     footerColor: 'text-blue-800',
   },
   {
-    emoji: '👨‍⚕️',
-    iconWrap: 'bg-teal-100 text-teal-700',
-    title: '¿Cómo se llamaba el cardiólogo?',
+    emoji: '📅',
+    iconWrap: 'bg-green-100 text-green-700',
+    title: '¿Cuándo es tu próxima cita con el cardiólogo?',
     description:
-      'Con varios especialistas es fácil confundirse. VidaRecord guarda el nombre, especialidad y teléfono de cada médico que has visitado. Un solo lugar para toda tu red de salud.',
-    footer: 'Directorio médico unificado',
-    footerIcon: 'fa-solid fa-address-book',
+      'VidaRecord organiza todas tus consultas médicas en un solo lugar. Sabe exactamente cuándo fue tu última visita, qué te diagnosticaron ese día, qué médico te atendió y cuándo debes volver. Nunca más pierdas el hilo de tus consultas.',
+    footer: 'Control total de tus consultas',
+    footerEmoji: '📋',
+    footerColor: 'text-green-800',
+  },
+  {
+    emoji: '🩺',
+    iconWrap: 'bg-purple-100 text-purple-700',
+    title: '¿Qué te diagnosticaron y cuándo?',
+    description:
+      'Guarda cada diagnóstico con la fecha exacta, el médico que lo emitió y el hospital o clínica. Sabe en todo momento cuáles condiciones están activas, cuáles son crónicas y cuáles ya fueron resueltas. Toda tu historia clínica, organizada y lista.',
+    footer: 'Historial de diagnósticos completo',
+    footerEmoji: '🏥',
+    footerColor: 'text-purple-800',
+  },
+  {
+    emoji: '📊',
+    iconWrap: 'bg-red-100 text-red-700',
+    title: '¿Cómo ha evolucionado tu presión arterial?',
+    description:
+      'Registra tu presión arterial, peso, glucosa y frecuencia cardíaca con fecha y hora. VidaRecord lleva el historial completo de cada medición para que puedas mostrárselo a tu médico en tu próxima consulta y él pueda ver cómo ha evolucionado tu salud.',
+    footer: 'Presión, peso, glucosa y más',
+    footerEmoji: '📈',
+    footerColor: 'text-red-800',
+  },
+  {
+    emoji: '📋',
+    iconWrap: 'bg-teal-100 text-teal-700',
+    title: 'Tu historia médica, siempre en tu bolsillo',
+    description:
+      'Consultas, medicamentos, diagnósticos, estudios y resultados — todo en una línea de tiempo cronológica. Cuando un médico te pida tu historial, lo tienes listo en segundos. Sin buscar papeles, sin tratar de recordar fechas.',
+    footer: 'Historial cronológico completo',
+    footerEmoji: '🕐',
     footerColor: 'text-teal-800',
   },
 ]
@@ -185,7 +215,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {problems.map((problem) => (
               <div
                 key={problem.title}
@@ -207,7 +237,12 @@ export default function Home() {
                 <div
                   className={`mt-6 pt-4 border-t border-slate-200/60 text-sm font-semibold flex items-center gap-2 ${problem.footerColor}`}
                 >
-                  <i className={problem.footerIcon} /> {problem.footer}
+                  {problem.footerIcon ? (
+                    <i className={problem.footerIcon} />
+                  ) : (
+                    <span>{problem.footerEmoji}</span>
+                  )}{' '}
+                  {problem.footer}
                 </div>
               </div>
             ))}
