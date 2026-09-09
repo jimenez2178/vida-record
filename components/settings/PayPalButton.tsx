@@ -42,7 +42,7 @@ export default function PayPalButton() {
         type="button"
         onClick={handleClick}
         disabled={status === 'loading'}
-        className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg py-3 transition-colors"
+        className="w-full flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg py-3 transition-colors"
       >
         <span className="font-black italic tracking-tight">
           Pay<span className="text-blue-200">Pal</span>

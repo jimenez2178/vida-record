@@ -6,7 +6,7 @@ export default function NavbarTop({ plan }: { plan: 'free' | 'premium' }) {
   const router = useRouter()
 
   return (
-    <header className="h-14 bg-white shadow-sm flex items-center justify-end px-4 md:px-8 gap-3 shrink-0">
+    <header className="hidden md:flex h-14 bg-white shadow-sm items-center justify-end px-4 md:px-8 gap-3 shrink-0">
       {plan === 'premium' ? (
         <span className="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-green-100 text-green-700">
           ⭐ Plan Premium
