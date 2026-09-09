@@ -52,6 +52,19 @@ export default function RegisterPage() {
       return
     }
 
+    try {
+      await fetch('/api/notifications/new-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          name: fullName.trim(),
+        }),
+      })
+    } catch {
+      // La notificación es informativa; el registro ya fue exitoso.
+    }
+
     if (data.session) {
       router.push('/dashboard')
       return
