@@ -67,6 +67,13 @@ export async function POST(request: Request) {
   const email = body?.email
   const name = body?.name
 
+  console.log('NOTIFICATION ENDPOINT CALLED', { email, name })
+  console.log('ENV CHECK:', {
+    hasResend: !!process.env.RESEND_API_KEY,
+    hasTelegram: !!process.env.TELEGRAM_BOT_TOKEN,
+    chatId: process.env.TELEGRAM_CHAT_ID,
+  })
+
   if (!email || typeof email !== 'string' || !name || typeof name !== 'string') {
     return NextResponse.json(
       { error: 'email y name son requeridos' },
@@ -75,33 +82,39 @@ export async function POST(request: Request) {
   }
 
   try {
-    await Promise.all([
-      resend.emails.send({
-        from: 'VidaRecord <onboarding@resend.dev>',
-        to: email,
-        subject: '¡Bienvenido a VidaRecord! 🩺',
-        html: buildWelcomeEmailHtml(name),
-      }),
-      fetch(
-        `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: buildTelegramMessage(name, email),
-            parse_mode: 'Markdown',
-          }),
-        }
-      ),
-    ])
-
-    return NextResponse.json({ success: true })
+    const result = await resend.emails.send({
+      from: 'VidaRecord <onboarding@resend.dev>',
+      to: email,
+      subject: '¡Bienvenido a VidaRecord! 🩺',
+      html: buildWelcomeEmailHtml(name),
+    })
+    console.log('RESEND RESULT:', JSON.stringify(result))
   } catch (error) {
-    console.error('New user notification error:', error)
-    return NextResponse.json(
-      { error: 'No se pudieron enviar las notificaciones' },
-      { status: 500 }
-    )
+    console.error('RESEND ERROR:', JSON.stringify(error))
   }
+
+  try {
+    const telegramRes = await fetch(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: process.env.TELEGRAM_CHAT_ID,
+          text: buildTelegramMessage(name, email),
+          parse_mode: 'Markdown',
+        }),
+      }
+    )
+    const telegramData = await telegramRes.json().catch(() => null)
+    console.log(
+      'TELEGRAM RESULT:',
+      telegramRes.status,
+      JSON.stringify(telegramData)
+    )
+  } catch (error) {
+    console.error('TELEGRAM ERROR:', JSON.stringify(error))
+  }
+
+  return NextResponse.json({ success: true })
 }
