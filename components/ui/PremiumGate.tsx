@@ -19,7 +19,7 @@ export default function PremiumGate({
         href="/configuracion"
         className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg px-6 py-3 transition-colors"
       >
-        Actualizar a Premium — $3.99/mes
+        Actualizar a Premium — $4.95/mes
       </Link>
     </div>
   )

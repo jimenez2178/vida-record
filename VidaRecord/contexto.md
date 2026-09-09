@@ -32,7 +32,7 @@ qué medicamentos toman o dónde están sus resultados médicos.
 - Sin IA
 - Sin PDF
 
-### Premium — $3.99/mes
+### Premium — $4.95/mes
 - Historial ilimitado
 - Medicamentos ilimitados
 - Documentos ilimitados

@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         user_id: user.id,
         paypal_order_id: orderID,
         plan: 'premium',
-        amount: 3.99,
+        amount: 4.95,
         currency: 'USD',
         status: 'active',
         starts_at: now.toISOString(),

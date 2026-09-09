@@ -43,7 +43,7 @@ export async function POST(request: Request) {
           {
             amount: {
               currencyCode: 'USD',
-              value: '3.99',
+              value: '4.95',
             },
             description: 'VidaRecord Premium — 1 mes',
           },

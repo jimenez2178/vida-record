@@ -50,7 +50,7 @@ export default function PayPalButton() {
         <span>
           {status === 'loading'
             ? 'Redirigiendo...'
-            : 'Pagar con PayPal — $3.99/mes'}
+            : 'Pagar con PayPal — $4.95/mes'}
         </span>
       </button>
 

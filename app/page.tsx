@@ -174,7 +174,7 @@ export default function Home() {
       </section>
 
       {/* CÓMO FUNCIONA */}
-      <section id="como-funciona" className="px-4 md:px-8 py-16 md:py-24">
+      <section id="como-funciona" className="bg-white px-4 md:px-8 py-16 md:py-24">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center">
             Todo tu historial médico, organizado
@@ -261,7 +261,7 @@ export default function Home() {
                 Para tu familia completa
               </p>
               <p className="text-4xl font-bold text-gray-800 mt-4">
-                $3.99
+                $4.95
                 <span className="text-base font-normal text-gray-400">
                   /mes
                 </span>
