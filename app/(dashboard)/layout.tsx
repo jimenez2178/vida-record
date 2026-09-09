@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import SidebarNav from '@/components/layout/SidebarNav'
 import NavbarTop from '@/components/layout/NavbarTop'
+import MobileNav from '@/components/layout/MobileNav'
 import Logo from '@/components/ui/Logo'
 import InstallPWA from '@/components/pwa/InstallPWA'
 
@@ -18,14 +19,6 @@ const navItems = [
   { href: '/perfil', label: 'Mi perfil', icon: 'user' },
   { href: '/resumen-pdf', label: 'Resumen PDF', icon: 'document' },
   { href: '/asistente', label: 'Asistente IA', icon: 'chat' },
-] as const
-
-const mobileNavItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: 'home' },
-  { href: '/citas', label: 'Citas', icon: 'building' },
-  { href: '/medicamentos', label: 'Medicamentos', icon: 'pill' },
-  { href: '/estudios', label: 'Estudios', icon: 'beaker' },
-  { href: '/configuracion', label: 'Config', icon: 'settings' },
 ] as const
 
 type IconName =
@@ -262,20 +255,16 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-10 bg-blue-900 text-white flex items-center justify-around py-2">
-        {mobileNavItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-white/90 hover:bg-blue-800 transition-colors"
-          >
-            <Icon name={item.icon} className="w-5 h-5" />
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <MobileNav
+        plan={plan}
+        links={navItems.map((item) => ({
+          href: item.href,
+          label: item.label,
+          icon: <Icon name={item.icon} />,
+        }))}
+      />
 
-      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen flex flex-col">
+      <main className="md:ml-64 pt-14 md:pt-0 min-h-screen flex flex-col">
         <NavbarTop plan={plan} />
         <div className="flex-1">{children}</div>
       </main>

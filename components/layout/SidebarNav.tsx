@@ -9,7 +9,13 @@ type NavLink = {
   icon: React.ReactNode
 }
 
-export default function SidebarNav({ links }: { links: NavLink[] }) {
+export default function SidebarNav({
+  links,
+  onLinkClick,
+}: {
+  links: NavLink[]
+  onLinkClick?: () => void
+}) {
   const pathname = usePathname()
 
   return (
@@ -21,6 +27,7 @@ export default function SidebarNav({ links }: { links: NavLink[] }) {
           <Link
             key={link.href}
             href={link.href}
+            onClick={onLinkClick}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-blue-700 text-white'
