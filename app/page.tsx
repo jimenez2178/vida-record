@@ -179,7 +179,7 @@ export default function Home() {
               <div className="relative w-full max-w-lg">
                 <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-teal-400 to-blue-400 opacity-30 blur-lg" />
                 <img
-                  src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800"
+                  src="https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=800"
                   alt="Señora mayor atendida en consulta médica con calidez"
                   className="relative w-full h-auto object-cover rounded-2xl shadow-2xl border-4 border-white/10"
                 />
