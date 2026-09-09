@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import PdfGenerator from '@/components/pdf/PdfGenerator'
+import PremiumGate from '@/components/ui/PremiumGate'
 
 export default async function ResumenPdfPage() {
   const supabase = await createClient()
@@ -10,6 +11,23 @@ export default async function ResumenPdfPage() {
 
   if (!user) {
     return null
+  }
+
+  const { data: userRow } = await supabase
+    .from('users')
+    .select('plan')
+    .eq('id', user.id)
+    .single()
+
+  if (userRow?.plan !== 'premium') {
+    return (
+      <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8 flex items-center justify-center">
+        <PremiumGate
+          featureName="Resumen PDF"
+          description="Genera y descarga tu historial médico completo en PDF para compartir con cualquier médico."
+        />
+      </div>
+    )
   }
 
   const { data: profile } = await supabase

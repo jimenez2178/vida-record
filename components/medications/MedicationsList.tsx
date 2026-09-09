@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { usePlan } from '@/hooks/usePlan'
+import FreeLimitBanner from '@/components/ui/FreeLimitBanner'
 import MedicationCard, { type Medication } from './MedicationCard'
 import MedicationModal from './MedicationModal'
 
@@ -13,6 +15,7 @@ export default function MedicationsList({
   userId: string
 }) {
   const supabase = createClient()
+  const { canAdd, refetch: refetchPlan } = usePlan()
 
   const [medications, setMedications] = useState<Medication[]>([])
   const [loading, setLoading] = useState(true)
@@ -53,12 +56,14 @@ export default function MedicationsList({
 
   const handleDelete = (id: string) => {
     setMedications((prev) => prev.filter((m) => m.id !== id))
+    refetchPlan()
   }
 
   const handleSuccess = () => {
     setModalOpen(false)
     setEditingMedication(null)
     fetchMedications()
+    refetchPlan()
   }
 
   return (
@@ -68,11 +73,18 @@ export default function MedicationsList({
         <button
           type="button"
           onClick={openNewModal}
-          className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors"
+          disabled={!canAdd.medications}
+          className={`text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors ${
+            canAdd.medications
+              ? 'bg-blue-700 hover:bg-blue-800'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
         >
           + Medicamento
         </button>
       </div>
+
+      {!canAdd.medications && <FreeLimitBanner feature="medications" />}
 
       {loading ? (
         <p className="text-gray-500 text-sm">Cargando medicamentos...</p>
@@ -88,7 +100,12 @@ export default function MedicationsList({
           <button
             type="button"
             onClick={openNewModal}
-            className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors"
+            disabled={!canAdd.medications}
+            className={`text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors ${
+              canAdd.medications
+                ? 'bg-blue-700 hover:bg-blue-800'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
           >
             Registrar mi primer medicamento
           </button>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { usePlan } from '@/hooks/usePlan'
+import FreeLimitBanner from '@/components/ui/FreeLimitBanner'
 import AppointmentCard, { type Appointment } from './AppointmentCard'
 import AppointmentModal from './AppointmentModal'
 
@@ -30,6 +32,7 @@ export default function AppointmentsList({
   userId: string
 }) {
   const supabase = createClient()
+  const { canAdd, refetch: refetchPlan } = usePlan()
 
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
@@ -71,12 +74,14 @@ export default function AppointmentsList({
 
   const handleDelete = (id: string) => {
     setAppointments((prev) => prev.filter((a) => a.id !== id))
+    refetchPlan()
   }
 
   const handleSuccess = () => {
     setModalOpen(false)
     setEditingAppointment(null)
     fetchAppointments()
+    refetchPlan()
   }
 
   return (
@@ -86,11 +91,18 @@ export default function AppointmentsList({
         <button
           type="button"
           onClick={openNewModal}
-          className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors"
+          disabled={!canAdd.appointments}
+          className={`text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors ${
+            canAdd.appointments
+              ? 'bg-blue-700 hover:bg-blue-800'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
         >
           + Nueva consulta
         </button>
       </div>
+
+      {!canAdd.appointments && <FreeLimitBanner feature="appointments" />}
 
       <div className="flex gap-2 mb-6 border-b border-gray-200">
         <button
@@ -131,7 +143,12 @@ export default function AppointmentsList({
           <button
             type="button"
             onClick={openNewModal}
-            className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors"
+            disabled={!canAdd.appointments}
+            className={`text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors ${
+              canAdd.appointments
+                ? 'bg-blue-700 hover:bg-blue-800'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
           >
             Registrar mi primera consulta
           </button>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { usePlan } from '@/hooks/usePlan'
+import FreeLimitBanner from '@/components/ui/FreeLimitBanner'
 import StudyCard, { type Study, type StudyType } from './StudyCard'
 import StudyModal from './StudyModal'
 
@@ -23,6 +25,7 @@ export default function StudiesList({
   userId: string
 }) {
   const supabase = createClient()
+  const { canAdd, refetch: refetchPlan } = usePlan()
 
   const [studies, setStudies] = useState<Study[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,12 +65,14 @@ export default function StudiesList({
 
   const handleDelete = (id: string) => {
     setStudies((prev) => prev.filter((s) => s.id !== id))
+    refetchPlan()
   }
 
   const handleSuccess = () => {
     setModalOpen(false)
     setEditingStudy(null)
     fetchStudies()
+    refetchPlan()
   }
 
   return (
@@ -79,11 +84,18 @@ export default function StudiesList({
         <button
           type="button"
           onClick={openNewModal}
-          className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors"
+          disabled={!canAdd.studies}
+          className={`text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors ${
+            canAdd.studies
+              ? 'bg-blue-700 hover:bg-blue-800'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
         >
           + Subir estudio
         </button>
       </div>
+
+      {!canAdd.studies && <FreeLimitBanner feature="studies" />}
 
       <div className="flex flex-wrap gap-2 mb-6">
         {filters.map((f) => (
@@ -116,7 +128,12 @@ export default function StudiesList({
           <button
             type="button"
             onClick={openNewModal}
-            className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors"
+            disabled={!canAdd.studies}
+            className={`text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition-colors ${
+              canAdd.studies
+                ? 'bg-blue-700 hover:bg-blue-800'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
           >
             Subir mi primer estudio
           </button>
