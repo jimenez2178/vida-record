@@ -197,6 +197,109 @@ export default function Home() {
         </div>
       </section>
 
+      {/* INSTALAR LA APP */}
+      <section className="bg-gray-50 px-4 md:px-8 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+              Instala VidaRecord en tu celular
+            </h2>
+            <p className="text-gray-500 mt-4">
+              Úsala como una app, con acceso directo desde tu pantalla de
+              inicio. No ocupa espacio de tienda ni requiere descargas.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+            {/* Android */}
+            <div className="bg-white rounded-2xl shadow-sm p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-3xl">🤖</span>
+                <h3 className="text-xl font-bold text-gray-800">Android</h3>
+              </div>
+              <ol className="space-y-4 text-sm text-gray-600">
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center">
+                    1
+                  </span>
+                  <span>Abre VidaRecord en Chrome desde tu celular.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center">
+                    2
+                  </span>
+                  <span>Toca el menú ⋮ en la esquina superior derecha.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center">
+                    3
+                  </span>
+                  <span>
+                    Selecciona <strong>&quot;Instalar aplicación&quot;</strong>{' '}
+                    o <strong>&quot;Agregar a pantalla de inicio&quot;</strong>
+                    .
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center">
+                    4
+                  </span>
+                  <span>
+                    Confirma tocando <strong>&quot;Instalar&quot;</strong>.
+                    Listo, ya tienes el ícono en tu pantalla de inicio.
+                  </span>
+                </li>
+              </ol>
+            </div>
+
+            {/* iOS */}
+            <div className="bg-white rounded-2xl shadow-sm p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-3xl">🍎</span>
+                <h3 className="text-xl font-bold text-gray-800">
+                  iPhone / iPad
+                </h3>
+              </div>
+              <ol className="space-y-4 text-sm text-gray-600">
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center">
+                    1
+                  </span>
+                  <span>Abre VidaRecord en Safari desde tu iPhone o iPad.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center">
+                    2
+                  </span>
+                  <span>
+                    Toca el ícono de compartir{' '}
+                    <span aria-hidden="true">⬆️</span> en la barra inferior.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center">
+                    3
+                  </span>
+                  <span>
+                    Desplázate y selecciona{' '}
+                    <strong>&quot;Agregar a pantalla de inicio&quot;</strong>.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-blue-900 text-white text-xs font-bold flex items-center justify-center">
+                    4
+                  </span>
+                  <span>
+                    Toca <strong>&quot;Agregar&quot;</strong>. Listo, ya
+                    tienes el ícono en tu pantalla de inicio.
+                  </span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* PLANES */}
       <section className="bg-white px-4 md:px-8 py-16 md:py-24">
         <div className="max-w-4xl mx-auto">
