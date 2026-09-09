@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown'
 import { createClient } from '@/lib/supabase/client'
 
 export type StudyType = 'laboratorio' | 'imagen' | 'receta' | 'otro'
@@ -358,9 +359,9 @@ export default function StudyCard({
           <p className="text-xs font-bold text-gray-700 mb-1">
             📋 Resumen IA:
           </p>
-          <p className="text-sm text-gray-700 whitespace-pre-line">
-            {aiSummary}
-          </p>
+          <div className="prose prose-sm max-w-none text-gray-700">
+            <ReactMarkdown>{aiSummary}</ReactMarkdown>
+          </div>
           <button
             type="button"
             onClick={handleAnalyze}
