@@ -7,6 +7,7 @@ import MobileNav from '@/components/layout/MobileNav'
 import Logo from '@/components/ui/Logo'
 import InstallPWA from '@/components/pwa/InstallPWA'
 import PremiumTopBanner from '@/components/ui/PremiumTopBanner'
+import AssistantFab from '@/components/layout/AssistantFab'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: 'home' },
@@ -300,14 +301,7 @@ export default async function DashboardLayout({
         <div className="flex-1">{children}</div>
       </main>
 
-      {plan === 'premium' && (
-        <Link
-          href="/asistente"
-          className="flex fixed bottom-24 md:bottom-6 right-6 z-30 items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-full shadow-lg px-5 py-3 transition-colors"
-        >
-          🤖 Asistente IA
-        </Link>
-      )}
+      {plan === 'premium' && <AssistantFab />}
 
       <InstallPWA />
     </div>
