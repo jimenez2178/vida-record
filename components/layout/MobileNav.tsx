@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Logo from '@/components/ui/Logo'
 import SidebarNav from '@/components/layout/SidebarNav'
@@ -143,6 +144,33 @@ export default function MobileNav({
         )}
 
         <div className="px-3 py-4 border-t border-blue-800">
+          <Link
+            href="/configuracion"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/90 hover:bg-blue-800 transition-colors mb-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.25 3.75l.386 1.933a7.48 7.48 0 012.728 1.575l1.897-.633.75 1.3-1.464 1.318a7.53 7.53 0 010 3.155l1.464 1.318-.75 1.3-1.897-.633a7.48 7.48 0 01-2.728 1.575l-.386 1.933h-1.5l-.386-1.933a7.48 7.48 0 01-2.728-1.575l-1.897.633-.75-1.3 1.464-1.318a7.53 7.53 0 010-3.155L3.99 7.925l.75-1.3 1.897.633a7.48 7.48 0 012.728-1.575l.386-1.933h1.5z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+              />
+            </svg>
+            Configuración
+          </Link>
+
           <button
             type="button"
             onClick={handleSignOut}
