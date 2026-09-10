@@ -30,30 +30,42 @@ export default function QuickActions({
         <button
           type="button"
           onClick={() => setOpenModal('cita')}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all"
         >
-          + Nueva consulta
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
+            +
+          </span>
+          Nueva consulta
         </button>
         <button
           type="button"
           onClick={() => setOpenModal('medicamento')}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all"
         >
-          + Medicamento
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
+            +
+          </span>
+          Medicamento
         </button>
         <button
           type="button"
           onClick={() => setOpenModal('estudio')}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all"
         >
-          + Estudio
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
+            +
+          </span>
+          Estudio
         </button>
         <button
           type="button"
           onClick={() => setOpenModal('medicion')}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm py-3 px-4 text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all"
         >
-          + Medición
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
+            +
+          </span>
+          Medición
         </button>
       </div>
 
