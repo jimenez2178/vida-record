@@ -147,60 +147,60 @@ export default async function DashboardPage() {
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-sm font-medium text-teal-700">Próxima cita</p>
+          <p className="text-base font-bold text-teal-800">Próxima cita</p>
           {appointment ? (
             <>
-              <p className="mt-2 text-lg font-semibold text-gray-800">
+              <p className="mt-2 text-xl font-bold text-gray-900">
                 {appointment.specialty || 'Consulta médica'}
               </p>
               {appointment.doctors?.name && (
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-base font-medium text-gray-700 mt-1">
                   {appointment.doctors.name}
                 </p>
               )}
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-base font-medium text-gray-700 mt-1">
                 {formatDate(appointment.date)}
               </p>
             </>
           ) : (
-            <p className="mt-2 text-lg font-semibold text-gray-800">
+            <p className="mt-2 text-xl font-bold text-gray-900">
               Sin citas programadas
             </p>
           )}
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-sm font-medium text-teal-700">
+          <p className="text-base font-bold text-teal-800">
             Medicamentos activos
           </p>
           {medicationCount > 0 ? (
             <>
-              <p className="mt-2 text-lg font-semibold text-gray-800">
+              <p className="mt-2 text-xl font-bold text-gray-900">
                 {medicationCount}{' '}
                 {medicationCount === 1 ? 'medicamento' : 'medicamentos'}
               </p>
-              <p className="text-sm text-gray-500 mt-1 truncate">
+              <p className="text-base font-medium text-gray-700 mt-1 truncate">
                 {medicationNames.join(', ')}
               </p>
             </>
           ) : (
-            <p className="mt-2 text-lg font-semibold text-gray-800">
+            <p className="mt-2 text-xl font-bold text-gray-900">
               Sin medicamentos activos
             </p>
           )}
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-sm font-medium text-teal-700">Últimos estudios</p>
+          <p className="text-base font-bold text-teal-800">Últimos estudios</p>
           {studies.length > 0 ? (
-            <div className="mt-2 space-y-1.5">
+            <div className="mt-2 space-y-2">
               {studies.map((s) => (
                 <div key={s.id}>
-                  <p className="text-sm font-semibold text-gray-800 truncate">
+                  <p className="text-lg font-bold text-gray-900 truncate">
                     {s.name}
                   </p>
                   {s.date && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-base font-medium text-gray-700">
                       {formatDate(s.date)}
                     </p>
                   )}
@@ -208,25 +208,25 @@ export default async function DashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-lg font-semibold text-gray-800">
+            <p className="mt-2 text-xl font-bold text-gray-900">
               Sin estudios registrados
             </p>
           )}
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-sm font-medium text-teal-700">Indicadores</p>
+          <p className="text-base font-bold text-teal-800">Indicadores</p>
           {indicator ? (
             <>
-              <p className="mt-2 text-lg font-semibold text-gray-800">
+              <p className="mt-2 text-xl font-bold text-gray-900">
                 {formatIndicatorValue(indicator)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-base font-medium text-gray-700 mt-1">
                 {indicatorTypeLabels[indicator.type] ?? indicator.type}
               </p>
             </>
           ) : (
-            <p className="mt-2 text-lg font-semibold text-gray-800">
+            <p className="mt-2 text-xl font-bold text-gray-900">
               Sin registros
             </p>
           )}
