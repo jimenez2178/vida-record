@@ -145,6 +145,11 @@ export default async function DashboardPage() {
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
       <DashboardGreeting displayName={displayName} />
 
+      <section className="mb-8">
+        <h2 className="text-gray-800 font-semibold mb-3">Acciones rápidas</h2>
+        <QuickActions profileId={profileId} userId={user.id} />
+      </section>
+
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <p className="text-base font-bold text-teal-800">Próxima cita</p>
@@ -231,11 +236,6 @@ export default async function DashboardPage() {
             </p>
           )}
         </div>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-gray-800 font-semibold mb-3">Acciones rápidas</h2>
-        <QuickActions profileId={profileId} userId={user.id} />
       </section>
     </div>
   )
