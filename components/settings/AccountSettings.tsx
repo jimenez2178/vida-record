@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import PayPalButton from './PayPalButton'
@@ -52,6 +52,54 @@ export default function AccountSettings({
 
   const [cancelling, setCancelling] = useState(false)
   const [cancelError, setCancelError] = useState('')
+
+  const [telegramChatId, setTelegramChatId] = useState<string | null>(null)
+  const [telegramInput, setTelegramInput] = useState('')
+  const [savingTelegram, setSavingTelegram] = useState(false)
+  const [telegramSuccess, setTelegramSuccess] = useState(false)
+  const [telegramError, setTelegramError] = useState('')
+
+  useEffect(() => {
+    const loadTelegramChatId = async () => {
+      const { data } = await supabase
+        .from('users')
+        .select('telegram_chat_id')
+        .eq('id', user.id)
+        .single()
+
+      if (data?.telegram_chat_id) {
+        setTelegramChatId(data.telegram_chat_id)
+        setTelegramInput(data.telegram_chat_id)
+      }
+    }
+
+    loadTelegramChatId()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id])
+
+  const handleSaveTelegram = async () => {
+    setSavingTelegram(true)
+    setTelegramSuccess(false)
+    setTelegramError('')
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ telegram_chat_id: telegramInput.trim() || null })
+        .eq('id', user.id)
+
+      if (error) {
+        throw new Error('save-failed')
+      }
+
+      setTelegramChatId(telegramInput.trim() || null)
+      setTelegramSuccess(true)
+    } catch {
+      setTelegramError('No se pudo guardar el Chat ID. Intenta de nuevo.')
+    } finally {
+      setSavingTelegram(false)
+    }
+  }
 
   const handleCancelPlan = async () => {
     const confirmed = window.confirm(
@@ -213,6 +261,72 @@ export default function AccountSettings({
             <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 mt-3">
               Te enviamos un correo con instrucciones para cambiar tu
               contraseña
+            </p>
+          )}
+        </section>
+
+        <section className="p-6">
+          <h2 className="text-gray-800 font-semibold mb-4">
+            🔔 Notificaciones por Telegram
+          </h2>
+
+          <p className="text-sm text-gray-600 mb-4">
+            Recibe recordatorios de tus citas directamente en Telegram. Es
+            gratis y muy fácil de configurar.
+          </p>
+
+          {telegramChatId && (
+            <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700 mb-4">
+              ✅ Telegram conectado
+            </span>
+          )}
+
+          <ol className="text-sm text-gray-600 space-y-1.5 mb-4 list-decimal list-inside">
+            <li>
+              Abre Telegram y busca{' '}
+              <span className="font-medium">@userinfobot</span>
+            </li>
+            <li>
+              Escríbele <span className="font-medium">/start</span>
+            </li>
+            <li>Copia el número que te responde y pégalo aquí</li>
+          </ol>
+
+          <div>
+            <label
+              htmlFor="telegramChatId"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Tu Chat ID de Telegram
+            </label>
+            <input
+              id="telegramChatId"
+              type="number"
+              value={telegramInput}
+              onChange={(e) => setTelegramInput(e.target.value)}
+              placeholder="Ej: 123456789"
+              className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveTelegram}
+            disabled={savingTelegram}
+            className="mt-4 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors"
+          >
+            {savingTelegram ? 'Guardando...' : 'Guardar'}
+          </button>
+
+          {telegramSuccess && (
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 mt-3">
+              ✅ Telegram conectado correctamente
+            </p>
+          )}
+
+          {telegramError && (
+            <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-3">
+              {telegramError}
             </p>
           )}
         </section>

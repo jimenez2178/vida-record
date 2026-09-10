@@ -45,14 +45,14 @@ function buildReminderMessage({
 _VidaRecord — vida-record.vercel.app_`
 }
 
-async function sendTelegramMessage(text: string) {
+async function sendTelegramMessage(chatId: string, text: string) {
   const res = await fetch(
     `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: process.env.TELEGRAM_CHAT_ID,
+        chat_id: chatId,
         text,
         parse_mode: 'Markdown',
       }),
@@ -96,7 +96,7 @@ export async function GET(request: Request) {
     const [{ data: userRow }, { data: profileRow }] = await Promise.all([
       supabaseAdmin
         .from('users')
-        .select('email')
+        .select('email, telegram_chat_id')
         .eq('id', appt.user_id)
         .maybeSingle(),
       supabaseAdmin
@@ -105,6 +105,12 @@ export async function GET(request: Request) {
         .eq('id', appt.profile_id)
         .maybeSingle(),
     ])
+
+    const chatId = userRow?.telegram_chat_id || process.env.TELEGRAM_CHAT_ID
+
+    if (!chatId) {
+      continue
+    }
 
     const message = buildReminderMessage({
       profileName: profileRow?.full_name ?? 'Paciente',
@@ -117,7 +123,7 @@ export async function GET(request: Request) {
     })
 
     try {
-      const sent = await sendTelegramMessage(message)
+      const sent = await sendTelegramMessage(chatId, message)
       if (sent) {
         remindersSent += 1
       }
