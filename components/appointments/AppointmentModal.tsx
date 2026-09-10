@@ -4,6 +4,16 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Appointment, AppointmentStatus } from './AppointmentCard'
 
+function isWithinNextDays(dateStr: string, days: number) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const target = new Date(`${dateStr}T00:00:00`)
+  const diffDays = Math.round(
+    (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  )
+  return diffDays >= 1 && diffDays <= days
+}
+
 export default function AppointmentModal({
   profileId,
   userId,
@@ -95,15 +105,39 @@ export default function AppointmentModal({
       status,
     }
 
-    const { error: saveError } = appointment
-      ? await supabase.from('appointments').update(payload).eq('id', appointment.id)
-      : await supabase.from('appointments').insert(payload)
+    const { data: savedAppointment, error: saveError } = appointment
+      ? await supabase
+          .from('appointments')
+          .update(payload)
+          .eq('id', appointment.id)
+          .select('id')
+          .single()
+      : await supabase
+          .from('appointments')
+          .insert(payload)
+          .select('id')
+          .single()
 
     setSaving(false)
 
     if (saveError) {
       setError('No se pudo guardar la consulta. Intenta de nuevo.')
       return
+    }
+
+    if (status === 'programada' && savedAppointment && isWithinNextDays(date, 7)) {
+      try {
+        await fetch('/api/notifications/appointment-reminder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            appointmentId: savedAppointment.id,
+            userId,
+          }),
+        })
+      } catch {
+        // No bloquea el flujo si falla la notificación
+      }
     }
 
     onSuccess()
