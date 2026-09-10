@@ -300,12 +300,14 @@ export default async function DashboardLayout({
         <div className="flex-1">{children}</div>
       </main>
 
-      <Link
-        href="/asistente"
-        className="hidden md:flex fixed bottom-6 right-6 items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-full shadow-lg px-5 py-3 transition-colors"
-      >
-        🤖 Asistente IA
-      </Link>
+      {plan === 'premium' && (
+        <Link
+          href="/asistente"
+          className="flex fixed bottom-24 md:bottom-6 right-6 z-30 items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-full shadow-lg px-5 py-3 transition-colors"
+        >
+          🤖 Asistente IA
+        </Link>
+      )}
 
       <InstallPWA />
     </div>
