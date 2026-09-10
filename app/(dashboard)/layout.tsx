@@ -6,6 +6,7 @@ import NavbarTop from '@/components/layout/NavbarTop'
 import MobileNav from '@/components/layout/MobileNav'
 import Logo from '@/components/ui/Logo'
 import InstallPWA from '@/components/pwa/InstallPWA'
+import PremiumTopBanner from '@/components/ui/PremiumTopBanner'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: 'home' },
@@ -294,6 +295,7 @@ export default async function DashboardLayout({
       />
 
       <main className="md:ml-64 pt-14 md:pt-0 min-h-screen flex flex-col">
+        {plan === 'free' && <PremiumTopBanner />}
         <NavbarTop plan={plan} />
         <div className="flex-1">{children}</div>
       </main>
