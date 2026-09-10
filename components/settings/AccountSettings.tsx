@@ -50,8 +50,32 @@ export default function AccountSettings({
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
 
-  const handleUpgrade = () => {
-    window.alert('¡Próximamente! Estamos configurando los pagos.')
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState('')
+
+  const handleCancelPlan = async () => {
+    const confirmed = window.confirm(
+      '¿Seguro que quieres cancelar tu plan Premium? Volverás al plan gratuito de inmediato.'
+    )
+
+    if (!confirmed) return
+
+    setCancelling(true)
+    setCancelError('')
+
+    try {
+      const res = await fetch('/api/account/cancel-plan', { method: 'POST' })
+
+      if (!res.ok) {
+        throw new Error('cancel-failed')
+      }
+
+      router.refresh()
+    } catch {
+      setCancelError('No se pudo cancelar el plan. Intenta de nuevo.')
+    } finally {
+      setCancelling(false)
+    }
   }
 
   const handleResetPassword = async () => {
@@ -134,16 +158,24 @@ export default function AccountSettings({
               </p>
               {user.plan_expires_at && (
                 <p className="text-sm text-green-700 mt-1">
-                  Vence el {formatDate(user.plan_expires_at)}
+                  Vence el {formatDate(user.plan_expires_at)} — si no renuevas,
+                  volverás automáticamente al plan gratuito.
                 </p>
               )}
               <button
                 type="button"
-                onClick={handleUpgrade}
-                className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                onClick={handleCancelPlan}
+                disabled={cancelling}
+                className="mt-4 bg-gray-200 hover:bg-gray-300 disabled:opacity-60 text-gray-700 text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
-                Gestionar suscripción
+                {cancelling ? 'Cancelando...' : 'Cancelar Premium y volver a Gratuito'}
               </button>
+
+              {cancelError && (
+                <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-3">
+                  {cancelError}
+                </p>
+              )}
             </div>
           ) : (
             <div className="bg-blue-50 rounded-xl p-5">
