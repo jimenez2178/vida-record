@@ -201,6 +201,15 @@ RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.users (id, email)
   VALUES (NEW.id, NEW.email);
+
+  INSERT INTO public.profiles (user_id, full_name, is_owner, relationship)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+    TRUE,
+    'yo'
+  );
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

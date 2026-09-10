@@ -232,7 +232,7 @@ export default function AccountSettings({
               </p>
               <ul className="text-sm text-gray-600 mt-3 space-y-1.5">
                 <li>✗ Máximo 5 consultas</li>
-                <li>✗ Máximo 3 medicamentos activos</li>
+                <li>✗ Máximo 5 medicamentos activos</li>
                 <li>✗ Máximo 5 documentos</li>
                 <li>✗ Sin resumen PDF</li>
                 <li>✗ Sin asistente IA</li>

@@ -41,6 +41,7 @@ export async function proxy(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/register') &&
     !request.nextUrl.pathname.startsWith('/forgot-password') &&
     !request.nextUrl.pathname.startsWith('/api/notifications') &&
+    !request.nextUrl.pathname.startsWith('/api/cron') &&
     request.nextUrl.pathname !== '/'
   ) {
     const url = request.nextUrl.clone()
