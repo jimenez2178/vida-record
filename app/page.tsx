@@ -90,6 +90,11 @@ const comoFuncionaPoints = [
     description:
       'Un documento PDF completo con toda tu historia médica, listo para mostrarle a cualquier doctor en cualquier momento.',
   },
+  {
+    title: 'Recibe recordatorios de tus citas en Telegram',
+    description:
+      'Conecta tu Telegram y recibe un aviso el día anterior a cada cita médica. Nunca más olvides una consulta importante.',
+  },
 ]
 
 const freeFeatures = [
@@ -97,6 +102,7 @@ const freeFeatures = [
   { included: true, text: 'Hasta 5 medicamentos' },
   { included: true, text: 'Hasta 5 documentos guardados' },
   { included: true, text: 'Historial cronológico' },
+  { included: true, text: 'Recordatorios por Telegram' },
   { included: false, text: 'Resumen PDF' },
   { included: false, text: 'Análisis IA de resultados' },
   { included: false, text: 'Perfiles familiares' },
@@ -104,6 +110,7 @@ const freeFeatures = [
 
 const premiumFeatures = [
   'Consultas ilimitadas',
+  'Recordatorios por Telegram',
   'Medicamentos ilimitados',
   'Documentos ilimitados',
   'Resumen PDF descargable',
