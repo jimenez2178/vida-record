@@ -90,11 +90,6 @@ const comoFuncionaPoints = [
     description:
       'Un documento PDF completo con toda tu historia médica, listo para mostrarle a cualquier doctor en cualquier momento.',
   },
-  {
-    title: 'Recibe recordatorios de tus citas en Telegram',
-    description:
-      'Conecta tu Telegram y recibe un aviso el día anterior a cada cita médica. Nunca más olvides una consulta importante.',
-  },
 ]
 
 const freeFeatures = [
@@ -301,6 +296,32 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+
+              <div className="mt-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 flex items-start gap-4">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-md">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 fill-blue-500">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.34 13.766l-2.955-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.803.793z" />
+                  </svg>
+                </div>
+
+                <div>
+                  <p className="text-white font-bold text-lg mb-1">
+                    🔔 Recordatorios de citas por Telegram
+                  </p>
+                  <p className="text-blue-100 text-sm leading-relaxed mb-3">
+                    Conecta tu cuenta de Telegram y recibe un aviso
+                    automático el día anterior a cada cita médica. Gratis
+                    para todos los usuarios.
+                  </p>
+                  <div className="bg-white/20 rounded-xl px-4 py-2 inline-flex items-center gap-2">
+                    <i className="fa-solid fa-gear text-white text-sm" />
+                    <span className="text-white text-sm font-medium">
+                      Actívalo en:{' '}
+                      <strong>Configuración → Notificaciones por Telegram</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
