@@ -10,9 +10,9 @@ const problems = [
   {
     emoji: '💊',
     iconWrap: 'bg-amber-100 text-amber-700',
-    title: 'El médico te recetó algo que no debía',
+    title: 'El médico le recetó algo que no debía',
     description:
-      'Muchos médicos recetan sin saber qué otros medicamentos toma el paciente. Esto puede ser riesgoso. Con VidaRecord, llegas con la lista completa y el médico cuenta con más información para decidir qué puede recetarte con seguridad.',
+      'Muchos médicos recetan sin saber qué otros medicamentos toma el paciente. Esto puede ser riesgoso. Con VidaRecord, llegas con la lista completa de tus padres y el médico cuenta con más información para decidir qué puede recetarles con seguridad.',
     footer: 'Prevención de contraindicaciones',
     footerIcon: 'fa-solid fa-shield-halved',
     footerColor: 'text-amber-800',
@@ -20,9 +20,9 @@ const problems = [
   {
     emoji: '🧪',
     iconWrap: 'bg-blue-100 text-blue-700',
-    title: 'Tienes un resultado en papel y no sabes qué dice',
+    title: 'Tienes un resultado de tus padres en papel y no sabes qué dice',
     description:
-      'Hemoglobina, triglicéridos, leucocitos... ¿Qué significa todo eso? Sube tu resultado a VidaRecord y nuestra IA te ayuda a entenderlo en palabras simples, para que llegues a tu próxima consulta con preguntas más claras para tu médico. No sustituye la evaluación de un profesional de la salud.',
+      'Hemoglobina, triglicéridos, leucocitos... ¿Qué significa todo eso? Sube su resultado a VidaRecord y nuestra IA te ayuda a entenderlo en palabras simples, para que llegues a la próxima consulta con preguntas más claras para el médico. No sustituye la evaluación de un profesional de la salud.',
     footer: 'Te ayuda a entender, sin tecnicismos',
     footerIcon: 'fa-solid fa-brain',
     footerColor: 'text-blue-800',
@@ -30,19 +30,19 @@ const problems = [
   {
     emoji: '📅',
     iconWrap: 'bg-green-100 text-green-700',
-    title: '¿Cuándo es tu próxima cita con el cardiólogo?',
+    title: '¿Cuándo es la próxima cita de tus padres con el cardiólogo?',
     description:
-      'VidaRecord organiza todas tus consultas médicas en un solo lugar. Sabe exactamente cuándo fue tu última visita, qué te diagnosticaron ese día, qué médico te atendió y cuándo debes volver. Nunca más pierdas el hilo de tus consultas.',
-    footer: 'Control total de tus consultas',
+      'VidaRecord organiza todas sus consultas médicas en un solo lugar. Sabe exactamente cuándo fue la última visita, qué les diagnosticaron ese día, qué médico los atendió y cuándo deben volver. Nunca más pierdas el hilo de sus consultas.',
+    footer: 'Control total de sus consultas',
     footerEmoji: '📋',
     footerColor: 'text-green-800',
   },
   {
     emoji: '🩺',
     iconWrap: 'bg-purple-100 text-purple-700',
-    title: '¿Qué te diagnosticaron y cuándo?',
+    title: '¿Qué le diagnosticaron a tus padres y cuándo?',
     description:
-      'Guarda cada diagnóstico con la fecha exacta, el médico que lo emitió y el hospital o clínica. Sabe en todo momento cuáles condiciones están activas, cuáles son crónicas y cuáles ya fueron resueltas. Toda tu historia clínica, organizada y lista.',
+      'Guarda cada diagnóstico de tus padres con la fecha exacta, el médico que lo emitió y el hospital o clínica. Sabe en todo momento cuáles condiciones están activas, cuáles son crónicas y cuáles ya fueron resueltas. Toda su historia clínica, organizada y lista.',
     footer: 'Historial de diagnósticos completo',
     footerEmoji: '🏥',
     footerColor: 'text-purple-800',
@@ -50,9 +50,9 @@ const problems = [
   {
     emoji: '📊',
     iconWrap: 'bg-red-100 text-red-700',
-    title: '¿Cómo ha evolucionado tu presión arterial?',
+    title: '¿Cómo ha evolucionado la presión arterial de tus padres?',
     description:
-      'Registra tu presión arterial, peso, glucosa y frecuencia cardíaca con fecha y hora. VidaRecord lleva el historial completo de cada medición para que puedas mostrárselo a tu médico en tu próxima consulta y él pueda ver cómo ha evolucionado tu salud.',
+      'Registra su presión arterial, peso, glucosa y frecuencia cardíaca con fecha y hora. VidaRecord lleva el historial completo de cada medición para que puedas mostrárselo al médico en la próxima consulta y él pueda ver cómo ha evolucionado su salud.',
     footer: 'Presión, peso, glucosa y más',
     footerEmoji: '📈',
     footerColor: 'text-red-800',
@@ -60,9 +60,9 @@ const problems = [
   {
     emoji: '📋',
     iconWrap: 'bg-teal-100 text-teal-700',
-    title: 'Tu historia médica, siempre en tu bolsillo',
+    title: 'La historia médica de tus padres, siempre en tu bolsillo',
     description:
-      'Consultas, medicamentos, diagnósticos, estudios y resultados — todo en una línea de tiempo cronológica. Cuando un médico te pida tu historial, lo tienes listo en segundos. Sin buscar papeles, sin tratar de recordar fechas.',
+      'Consultas, medicamentos, diagnósticos, estudios y resultados — todo en una línea de tiempo cronológica. Cuando un médico te pida su historial, lo tienes listo en segundos. Sin buscar papeles, sin tratar de recordar fechas.',
     footer: 'Historial cronológico completo',
     footerEmoji: '🕐',
     footerColor: 'text-teal-800',
@@ -71,24 +71,24 @@ const problems = [
 
 const comoFuncionaPoints = [
   {
-    title: 'Llegas al médico con toda tu información',
+    title: 'Llegas a la consulta con toda su información',
     description:
-      'Tu lista de medicamentos, diagnósticos, alergias y estudios recientes, listos para mostrar en cualquier consulta.',
+      'La lista de medicamentos, diagnósticos, alergias y estudios recientes de tus padres, lista para mostrar en cualquier consulta.',
   },
   {
     title: 'El médico decide con más información',
     description:
-      'Ayudas a evitar medicamentos que no debes tomar, interacciones riesgosas y duplicar tratamientos que ya tienes.',
+      'Ayudas a evitar medicamentos que no deben tomar, interacciones riesgosas y duplicar tratamientos que ya tienen.',
   },
   {
-    title: 'Tus resultados, en lenguaje sencillo',
+    title: 'Sus resultados, en lenguaje sencillo',
     description:
-      'Nuestra IA te ayuda a entender tus resultados de laboratorio, sin términos médicos complicados. No sustituye la evaluación de un profesional de la salud.',
+      'Nuestra IA te ayuda a entender los resultados de laboratorio de tus padres, sin términos médicos complicados. No sustituye la evaluación de un profesional de la salud.',
   },
   {
-    title: 'Genera tu resumen médico en un clic',
+    title: 'Genera su resumen médico en un clic',
     description:
-      'Un documento PDF completo con toda tu historia médica, listo para mostrarle a cualquier doctor en cualquier momento.',
+      'Un documento PDF completo con toda su historia médica, listo para mostrarle a cualquier doctor en cualquier momento.',
   },
 ]
 
@@ -99,7 +99,7 @@ const freeFeatures = [
   { included: true, text: 'Historial cronológico' },
   { included: true, text: 'Recordatorios por Telegram' },
   { included: false, text: 'Resumen PDF' },
-  { included: false, text: 'IA te ayuda a entender tus resultados' },
+  { included: false, text: 'IA te ayuda a entender sus resultados' },
   { included: false, text: 'Perfiles familiares' },
 ]
 
@@ -109,7 +109,7 @@ const premiumFeatures = [
   'Medicamentos ilimitados',
   'Documentos ilimitados',
   'Resumen PDF descargable',
-  'IA te ayuda a entender tus resultados',
+  'IA te ayuda a entender sus resultados',
   'Hasta 5 perfiles familiares',
 ]
 
@@ -211,11 +211,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              ¿Te ha pasado alguna de estas situaciones?
+              ¿Te ha pasado alguna de estas situaciones con tus padres?
             </h2>
             <p className="mt-4 text-lg text-slate-600">
-              Son contratiempos muy comunes en las consultas que pueden poner
-              en riesgo la tranquilidad de tu familia.
+              Son contratiempos muy comunes cuando cuidamos la salud de
+              nuestros padres, y pueden generar mucha preocupación.
             </p>
           </div>
 
@@ -262,10 +262,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Tu información, organizada cuando más la necesitas
+              La información de tus padres, organizada cuando más la necesites
             </h2>
             <p className="mt-3 text-xl text-slate-500 font-medium">
-              Porque tener tu información médica organizada puede marcar la diferencia cuando más la necesitas.
+              Porque tener su información médica organizada puede marcar la diferencia cuando más la necesites.
             </p>
           </div>
 
@@ -336,7 +336,7 @@ export default function Home() {
               Diseñado para toda la familia
             </h2>
             <p className="mt-3 text-lg text-slate-600">
-              Desde el abuelo hasta los nietos. Un solo lugar para el
+              Desde tus padres hasta tus hijos. Un solo lugar para el
               historial médico de todos.
             </p>
           </div>
@@ -482,12 +482,13 @@ export default function Home() {
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
-            Tu salud merece estar organizada
+            La salud de tus padres merece estar organizada
           </h2>
 
           <p className="text-lg sm:text-xl text-teal-100 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
-            Miles de personas llegan al médico sin recordar qué medicamentos
-            toman. Tú no tienes que ser una de ellas.
+            Miles de personas llegan a la consulta sin recordar qué
+            medicamentos toman sus padres. Tú no tienes por qué ser una de
+            ellas.
           </p>
 
           <div className="mb-6">
@@ -495,7 +496,7 @@ export default function Home() {
               href="/register"
               className="inline-block px-8 py-5 rounded-2xl font-extrabold bg-white text-blue-900 hover:bg-teal-50 text-xl shadow-2xl transition hover:scale-105 active:scale-100"
             >
-              Crear mi cuenta gratis ahora
+              Empieza gratis ahora
             </Link>
           </div>
 
