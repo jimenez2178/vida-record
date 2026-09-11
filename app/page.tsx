@@ -273,7 +273,7 @@ export default function Home() {
             <div className="order-2 lg:order-1 flex justify-center">
               <div className="relative w-full max-w-lg">
                 <img
-                  src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800"
+                  src="/doctor.png"
                   alt="Doctor revisando historial médico con paciente adulto mayor"
                   className="w-full h-auto object-cover rounded-2xl shadow-xl border-4 border-white"
                 />
