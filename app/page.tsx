@@ -12,7 +12,7 @@ const problems = [
     iconWrap: 'bg-amber-100 text-amber-700',
     title: 'El médico te recetó algo que no debía',
     description:
-      'Muchos médicos recetan sin saber qué otros medicamentos toma el paciente. Esto puede ser peligroso. Con VidaRecord, llegas con la lista completa y el médico sabe exactamente qué puede y qué no puede recetarte.',
+      'Muchos médicos recetan sin saber qué otros medicamentos toma el paciente. Esto puede ser riesgoso. Con VidaRecord, llegas con la lista completa y el médico cuenta con más información para decidir qué puede recetarte con seguridad.',
     footer: 'Prevención de contraindicaciones',
     footerIcon: 'fa-solid fa-shield-halved',
     footerColor: 'text-amber-800',
@@ -22,8 +22,8 @@ const problems = [
     iconWrap: 'bg-blue-100 text-blue-700',
     title: 'Tienes un resultado en papel y no sabes qué dice',
     description:
-      'Hemoglobina, triglicéridos, leucocitos... ¿Qué significa todo eso? Sube tu resultado a VidaRecord y nuestra IA te lo explica en palabras simples, para que llegues a tu próxima consulta entendiendo tu propia salud.',
-    footer: 'Explicación IA sin tecnicismos',
+      'Hemoglobina, triglicéridos, leucocitos... ¿Qué significa todo eso? Sube tu resultado a VidaRecord y nuestra IA te ayuda a entenderlo en palabras simples, para que llegues a tu próxima consulta con preguntas más claras para tu médico. No sustituye la evaluación de un profesional de la salud.',
+    footer: 'Te ayuda a entender, sin tecnicismos',
     footerIcon: 'fa-solid fa-brain',
     footerColor: 'text-blue-800',
   },
@@ -76,14 +76,14 @@ const comoFuncionaPoints = [
       'Tu lista de medicamentos, diagnósticos, alergias y estudios recientes, listos para mostrar en cualquier consulta.',
   },
   {
-    title: 'El médico sabe exactamente qué recetarte',
+    title: 'El médico decide con más información',
     description:
-      'Evitas medicamentos que no debes tomar, interacciones peligrosas y duplicar tratamientos que ya tienes.',
+      'Ayudas a evitar medicamentos que no debes tomar, interacciones riesgosas y duplicar tratamientos que ya tienes.',
   },
   {
-    title: 'Tus resultados, explicados en tu idioma',
+    title: 'Tus resultados, en lenguaje sencillo',
     description:
-      'Nuestra IA lee tus resultados de laboratorio y te los explica de forma simple. Sin términos médicos complicados.',
+      'Nuestra IA te ayuda a entender tus resultados de laboratorio, sin términos médicos complicados. No sustituye la evaluación de un profesional de la salud.',
   },
   {
     title: 'Genera tu resumen médico en un clic',
@@ -99,7 +99,7 @@ const freeFeatures = [
   { included: true, text: 'Historial cronológico' },
   { included: true, text: 'Recordatorios por Telegram' },
   { included: false, text: 'Resumen PDF' },
-  { included: false, text: 'Análisis IA de resultados' },
+  { included: false, text: 'IA te ayuda a entender tus resultados' },
   { included: false, text: 'Perfiles familiares' },
 ]
 
@@ -109,7 +109,7 @@ const premiumFeatures = [
   'Medicamentos ilimitados',
   'Documentos ilimitados',
   'Resumen PDF descargable',
-  'IA explica tus resultados',
+  'IA te ayuda a entender tus resultados',
   'Hasta 5 perfiles familiares',
 ]
 
@@ -261,10 +261,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              VidaRecord puede salvarte la vida
+              Tu información, organizada cuando más la necesitas
             </h2>
             <p className="mt-3 text-xl text-slate-500 font-medium">
-              No es exageración. Aquí te explicamos cómo.
+              Porque tener tu información médica organizada puede marcar la diferencia cuando más la necesitas.
             </p>
           </div>
 
@@ -521,6 +521,9 @@ export default function Home() {
               </p>
             </div>
           </div>
+          <p className="mt-8 pt-6 border-t border-slate-800 text-xs text-slate-500 text-center">
+            VidaRecord no sustituye la evaluación de un profesional de la salud. La información generada por IA es solo orientativa; ante cualquier duda o decisión médica, consulta siempre a tu médico.
+          </p>
         </div>
       </footer>
     </div>
