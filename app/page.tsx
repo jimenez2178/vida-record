@@ -343,7 +343,7 @@ export default function Home() {
 
           <div className="max-w-4xl mx-auto mb-10 overflow-hidden rounded-2xl shadow-2xl border-4 border-slate-100">
             <img
-              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800"
+              src="/familia.png"
               alt="Familia sonriente junto a adulto mayor"
               className="w-full h-80 sm:h-96 object-cover hover:scale-105 transition-transform duration-500"
             />
