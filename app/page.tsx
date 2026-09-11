@@ -182,7 +182,7 @@ export default function Home() {
                 <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-teal-400 to-blue-400 opacity-30 blur-lg" />
                 <img
                   src="/hero-landing.jpg"
-                  alt="Señora mostrando su historial médico en el celular a su médico durante una consulta"
+                  alt="Hija adulta mostrándole a su mamá mayor la aplicación VidaRecord en su celular, ambas sonriendo"
                   className="relative w-full h-auto object-cover rounded-2xl shadow-2xl border-4 border-white/10"
                   loading="eager"
                 />
