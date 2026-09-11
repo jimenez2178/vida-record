@@ -131,16 +131,16 @@ export default function Home() {
             <div className="space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-500/20 border border-teal-300/30 text-teal-300 font-medium text-sm">
                 <i className="fa-solid fa-heart text-teal-300" />
-                <span>Tu salud, siempre organizada</span>
+                <span>Para quienes cuidan de sus padres</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white">
-                ¿Recuerdas todo lo que tu médico necesita saber de ti?
+                ¿Eres tú quien está pendiente de la salud de tus padres?
               </h1>
 
               <p className="text-slate-100 text-lg sm:text-xl font-normal leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Muchas personas llegan al médico sin recordar qué toman, qué
-                les diagnosticaron o dónde están sus resultados.{' '}
+                Ten su información médica organizada y disponible cuando la
+                necesites.{' '}
                 <strong className="font-semibold text-teal-200">
                   VidaRecord lo organiza todo por ti.
                 </strong>
@@ -151,7 +151,7 @@ export default function Home() {
                   href="/register"
                   className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold bg-white text-blue-900 hover:bg-teal-50 text-lg shadow-xl shadow-black/20 hover:-translate-y-0.5 transition-all focus:ring-4 focus:ring-teal-300 text-center"
                 >
-                  Crear mi cuenta gratis
+                  Empieza gratis
                 </Link>
                 <a
                   href="#como-funciona"
@@ -192,10 +192,11 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="font-bold text-sm text-slate-900">
-                      Consulta médica sin olvidos
+                      Los datos de mamá y papá, siempre a mano
                     </p>
                     <p className="text-xs text-slate-600">
-                      Lleva siempre tus diagnósticos y recetas al día.
+                      Diagnósticos, medicamentos y recetas al día, listos
+                      cuando los necesites.
                     </p>
                   </div>
                 </div>
