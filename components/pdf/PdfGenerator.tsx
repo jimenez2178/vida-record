@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+import autoTable, { type RowInput, type Styles } from 'jspdf-autotable'
 
 type Profile = {
   id: string
@@ -15,12 +15,17 @@ type Profile = {
   emergency_contact_phone: string | null
 }
 
+type DoctorRef = { name: string } | null
+
 type AppointmentRow = {
   id: string
   date: string
   specialty: string | null
+  clinic_name: string | null
+  reason: string | null
   diagnosis: string | null
-  doctors: { name: string } | null
+  notes: string | null
+  doctors: DoctorRef
 }
 
 type MedicationRow = {
@@ -29,13 +34,18 @@ type MedicationRow = {
   dose: string | null
   frequency: string | null
   start_date: string | null
+  notes: string | null
+  doctors: DoctorRef
 }
 
 type DiagnosisRow = {
   id: string
   name: string
+  description: string | null
+  notes: string | null
   is_chronic: boolean
   diagnosed_at: string | null
+  doctors: DoctorRef
 }
 
 type StudyRow = {
@@ -43,6 +53,7 @@ type StudyRow = {
   name: string
   type: string | null
   date: string | null
+  notes: string | null
 }
 
 type IndicatorRow = {
@@ -51,21 +62,43 @@ type IndicatorRow = {
   value_secondary: number | null
   unit: string | null
   measured_at: string
+  notes: string | null
 }
 
 type SectionKey =
   | 'personal'
+  | 'diagnoses'
   | 'medications'
   | 'appointments'
-  | 'diagnoses'
   | 'studies'
   | 'indicators'
 
+type TableSectionKey = Exclude<SectionKey, 'personal'>
+
+// Una fila principal de la tabla más sus detalles de texto libre, que se
+// imprimen debajo ocupando todo el ancho para que no se corten.
+type Detail = { label: string; value: string | null | undefined }
+
+type TableRow = {
+  id: string
+  cells: string[]
+  details: Detail[]
+}
+
+type TableSection = {
+  key: TableSectionKey
+  head: string[]
+  rows: TableRow[]
+  empty: string
+  // Anchos fijos (mm) por índice de columna; el resto se reparte solo.
+  widths: Record<number, number>
+}
+
 const sectionLabels: Record<SectionKey, string> = {
   personal: 'Datos personales',
+  diagnoses: 'Diagnósticos activos',
   medications: 'Medicamentos activos',
   appointments: 'Últimas consultas',
-  diagnoses: 'Diagnósticos activos',
   studies: 'Estudios recientes',
   indicators: 'Indicadores de salud',
 }
@@ -87,14 +120,44 @@ const studyTypeLabels: Record<string, string> = {
   otro: 'Otro',
 }
 
+const BLUE: [number, number, number] = [29, 78, 216]
+const TEXT_DARK: [number, number, number] = [31, 41, 55]
+const TEXT_MUTED: [number, number, number] = [107, 114, 128]
+const ROW_ALT: [number, number, number] = [243, 246, 251]
+const ROW_BORDER: [number, number, number] = [220, 226, 236]
+
+function parseDate(dateStr: string) {
+  return dateStr.length === 10 ? new Date(`${dateStr}T00:00:00`) : new Date(dateStr)
+}
+
 function formatDate(dateStr: string | null) {
   if (!dateStr) return null
-  const date = dateStr.length === 10 ? new Date(`${dateStr}T00:00:00`) : new Date(dateStr)
-  return date.toLocaleDateString('es-ES', {
+  return parseDate(dateStr).toLocaleDateString('es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   })
+}
+
+function formatShortDate(dateStr: string | null) {
+  if (!dateStr) return null
+  return parseDate(dateStr).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function calculateAge(dateStr: string | null) {
+  if (!dateStr) return null
+  const birth = parseDate(dateStr)
+  const now = new Date()
+  let age = now.getFullYear() - birth.getFullYear()
+  const monthDiff = now.getMonth() - birth.getMonth()
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+    age--
+  }
+  return age
 }
 
 function formatIndicatorValue(indicator: IndicatorRow) {
@@ -104,6 +167,45 @@ function formatIndicatorValue(indicator: IndicatorRow) {
     }`
   }
   return `${indicator.value_primary}${indicator.unit ? ` ${indicator.unit}` : ''}`
+}
+
+function formatEmergencyContact(profile: Profile) {
+  if (!profile.emergency_contact_name) return 'No especificado'
+  return `${profile.emergency_contact_name}${
+    profile.emergency_contact_phone ? ` - ${profile.emergency_contact_phone}` : ''
+  }`
+}
+
+function presentDetails(details: Detail[]) {
+  return details.filter((d): d is { label: string; value: string } =>
+    Boolean(d.value?.trim())
+  )
+}
+
+// Las fuentes estándar de jsPDF solo cubren WinAnsi (Latin-1 + algunos
+// signos). Sustituye los símbolos médicos comunes que quedan fuera y elimina
+// el resto (emojis, etc.) para que no salgan caracteres basura en el PDF.
+const pdfReplacements: Record<string, string> = {
+  '≥': '>=',
+  '≤': '<=',
+  '≠': '!=',
+  '→': '->',
+  '←': '<-',
+  '−': '-',
+  '✓': '',
+  '✔': '',
+}
+const winAnsiExtras = '€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ'
+
+function toPdfText(text: string) {
+  return Array.from(text.normalize('NFC'))
+    .map((char) => {
+      if (char in pdfReplacements) return pdfReplacements[char]
+      const code = char.codePointAt(0) ?? 0
+      if (code <= 0xff || winAnsiExtras.includes(char)) return char
+      return ''
+    })
+    .join('')
 }
 
 function getLastAutoTableFinalY(doc: jsPDF, fallback: number) {
@@ -124,13 +226,14 @@ export default function PdfGenerator({
   medications: MedicationRow[]
   diagnoses: DiagnosisRow[]
   studies: StudyRow[]
-  indicators: IndicatorRow[]
+  // Lecturas por tipo, de la más reciente a la más antigua.
+  indicators: IndicatorRow[][]
 }) {
   const [sections, setSections] = useState<Record<SectionKey, boolean>>({
     personal: true,
+    diagnoses: true,
     medications: true,
     appointments: true,
-    diagnoses: true,
     studies: true,
     indicators: true,
   })
@@ -142,14 +245,134 @@ export default function PdfGenerator({
     setSections((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const todayLabel = (() => {
-    const label = new Date().toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
-    return label
-  })()
+  const todayLabel = new Date().toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+
+  const age = calculateAge(profile.date_of_birth)
+  const patientMeta = [
+    age !== null ? `${age} años` : null,
+    profile.date_of_birth
+      ? `Nacimiento: ${formatDate(profile.date_of_birth)}`
+      : null,
+    `Tipo de sangre: ${profile.blood_type || 'No especificado'}`,
+  ]
+    .filter(Boolean)
+    .join('   |   ')
+
+  const criticalInfo: Detail[] = [
+    { label: 'Alergias', value: profile.allergies || 'Ninguna registrada' },
+    {
+      label: 'Notas médicas importantes',
+      value: profile.medical_notes || 'Ninguna',
+    },
+  ]
+
+  const tableSections: TableSection[] = [
+    {
+      key: 'diagnoses',
+      head: ['Diagnóstico', 'Tipo', 'Fecha', 'Médico'],
+      empty: 'Sin diagnósticos activos.',
+      widths: { 1: 18, 2: 26, 3: 44 },
+      rows: diagnoses.map((d) => ({
+        id: d.id,
+        cells: [
+          d.name,
+          d.is_chronic ? 'Crónico' : 'Agudo',
+          formatShortDate(d.diagnosed_at) || '—',
+          d.doctors?.name || '—',
+        ],
+        details: [
+          { label: 'Descripción', value: d.description },
+          { label: 'Notas', value: d.notes },
+        ],
+      })),
+    },
+    {
+      key: 'medications',
+      head: ['Medicamento', 'Dosis', 'Frecuencia', 'Desde'],
+      empty: 'Sin medicamentos activos.',
+      widths: { 1: 26, 2: 52, 3: 26 },
+      rows: medications.map((m) => ({
+        id: m.id,
+        cells: [
+          m.name,
+          m.dose || '—',
+          m.frequency || '—',
+          formatShortDate(m.start_date) || '—',
+        ],
+        details: [
+          { label: 'Indicado por', value: m.doctors?.name },
+          { label: 'Notas', value: m.notes },
+        ],
+      })),
+    },
+    {
+      key: 'appointments',
+      head: ['Fecha', 'Especialidad', 'Médico', 'Centro médico'],
+      empty: 'Sin consultas registradas.',
+      widths: { 0: 26, 1: 40, 2: 50 },
+      rows: appointments.map((a) => ({
+        id: a.id,
+        cells: [
+          formatShortDate(a.date) || '—',
+          a.specialty || '—',
+          a.doctors?.name || '—',
+          a.clinic_name || '—',
+        ],
+        details: [
+          { label: 'Motivo', value: a.reason },
+          { label: 'Diagnóstico', value: a.diagnosis },
+          { label: 'Notas', value: a.notes },
+        ],
+      })),
+    },
+    {
+      key: 'studies',
+      head: ['Estudio', 'Tipo', 'Fecha'],
+      empty: 'Sin estudios registrados.',
+      widths: { 1: 30, 2: 30 },
+      rows: studies.map((s) => ({
+        id: s.id,
+        cells: [
+          s.name,
+          (s.type && studyTypeLabels[s.type]) || s.type || '—',
+          formatShortDate(s.date) || '—',
+        ],
+        details: [{ label: 'Notas', value: s.notes }],
+      })),
+    },
+    {
+      key: 'indicators',
+      head: ['Indicador', 'Último valor', 'Fecha', 'Lecturas anteriores'],
+      empty: 'Sin indicadores registrados.',
+      widths: { 0: 38, 1: 30, 2: 26 },
+      rows: indicators
+        .filter((readings) => readings.length > 0)
+        .map((readings) => {
+          const [latest, ...previous] = readings
+          return {
+            id: latest.type,
+            cells: [
+              indicatorTypeLabels[latest.type] ?? latest.type,
+              formatIndicatorValue(latest),
+              formatShortDate(latest.measured_at) || '—',
+              previous.length > 0
+                ? previous
+                    .map(
+                      (r) =>
+                        `${formatIndicatorValue(r)} (${formatShortDate(r.measured_at)})`
+                    )
+                    .join('\n')
+                : '—',
+            ],
+            details: [{ label: 'Notas', value: latest.notes }],
+          }
+        }),
+    },
+  ]
 
   const handleGeneratePdf = () => {
     setGenerating(true)
@@ -157,232 +380,246 @@ export default function PdfGenerator({
 
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
     const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
     const marginX = 15
-    let y = 20
+    const contentWidth = pageWidth - marginX * 2
+    const topMargin = 18
+    const bottomLimit = pageHeight - 24
+    let y = topMargin
 
     const ensureSpace = (needed: number) => {
-      const pageHeight = doc.internal.pageSize.getHeight()
-      if (y + needed > pageHeight - 22) {
+      if (y + needed > bottomLimit) {
         doc.addPage()
-        y = 20
+        y = topMargin
       }
     }
 
     const addSectionTitle = (title: string) => {
-      ensureSpace(20)
-      doc.setFontSize(13)
+      // Reserva espacio para el título y al menos la primera fila de la tabla.
+      ensureSpace(28)
+      doc.setFontSize(12.5)
       doc.setFont('helvetica', 'bold')
-      doc.setTextColor(29, 78, 216)
+      doc.setTextColor(...BLUE)
       doc.text(title, marginX, y)
+      y += 1.8
+      doc.setDrawColor(...ROW_BORDER)
+      doc.setLineWidth(0.3)
+      doc.line(marginX, y, pageWidth - marginX, y)
       doc.setFont('helvetica', 'normal')
-      y += 7
+      y += 4
     }
 
-    // Header
-    doc.setFontSize(22)
+    const addEmptyMessage = (message: string) => {
+      doc.setFontSize(9.5)
+      doc.setTextColor(...TEXT_MUTED)
+      doc.text(message, marginX, y + 2)
+      y += 12
+    }
+
+    const addGroupedTable = (section: TableSection) => {
+      const body: RowInput[] = []
+      const groupOf: number[] = []
+      const isDetailRow: boolean[] = []
+
+      section.rows.forEach((row, groupIndex) => {
+        body.push(row.cells.map((cell) => toPdfText(cell || '—')))
+        groupOf.push(groupIndex)
+        isDetailRow.push(false)
+
+        const details = presentDetails(row.details)
+        if (details.length > 0) {
+          body.push([
+            {
+              content: toPdfText(
+                details.map((d) => `${d.label}: ${d.value.trim()}`).join('\n')
+              ),
+              colSpan: section.head.length,
+            },
+          ])
+          groupOf.push(groupIndex)
+          isDetailRow.push(true)
+        }
+      })
+
+      const columnStyles: Record<number, Partial<Styles>> = {}
+      Object.entries(section.widths).forEach(([index, width]) => {
+        columnStyles[Number(index)] = { cellWidth: width }
+      })
+
+      autoTable(doc, {
+        startY: y,
+        margin: { left: marginX, right: marginX, top: topMargin, bottom: 26 },
+        head: [section.head],
+        body,
+        theme: 'plain',
+        rowPageBreak: 'avoid',
+        showHead: 'everyPage',
+        headStyles: {
+          fillColor: BLUE,
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 9,
+        },
+        styles: {
+          font: 'helvetica',
+          fontSize: 9,
+          textColor: TEXT_DARK,
+          cellPadding: { top: 2.2, bottom: 2.2, left: 3, right: 3 },
+          overflow: 'linebreak',
+          valign: 'top',
+        },
+        columnStyles,
+        didParseCell: (data) => {
+          if (data.section !== 'body') return
+          const rowIndex = data.row.index
+          const styles = data.cell.styles
+
+          if (groupOf[rowIndex] % 2 === 1) styles.fillColor = ROW_ALT
+
+          if (isDetailRow[rowIndex]) {
+            styles.fontSize = 8.5
+            styles.textColor = [55, 65, 81]
+            styles.cellPadding = { top: 0.5, bottom: 3, left: 3, right: 3 }
+          } else if (data.column.index === 0) {
+            styles.fontStyle = 'bold'
+          }
+
+          if (groupOf[rowIndex + 1] !== groupOf[rowIndex]) {
+            styles.lineWidth = { bottom: 0.25 }
+            styles.lineColor = ROW_BORDER
+          }
+        },
+      })
+
+      y = getLastAutoTableFinalY(doc, y) + 10
+    }
+
+    // Encabezado
+    doc.setFontSize(20)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(29, 78, 216)
-    doc.text('VidaRecord', marginX, y)
+    doc.setTextColor(...BLUE)
+    doc.text('VidaRecord', marginX, y + 2)
 
-    y += 7
-    doc.setFontSize(12)
+    doc.setFontSize(11)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(80, 80, 80)
-    doc.text('Resumen Médico Personal', marginX, y)
+    doc.setTextColor(...TEXT_DARK)
+    doc.text('Resumen Médico Personal', pageWidth - marginX, y - 1, {
+      align: 'right',
+    })
+    doc.setFontSize(8.5)
+    doc.setTextColor(...TEXT_MUTED)
+    doc.text(`Generado el ${todayLabel}`, pageWidth - marginX, y + 4, {
+      align: 'right',
+    })
 
-    y += 4
-    doc.setDrawColor(29, 78, 216)
+    y += 8
+    doc.setDrawColor(...BLUE)
     doc.setLineWidth(0.8)
     doc.line(marginX, y, pageWidth - marginX, y)
-
-    y += 6
-    doc.setFontSize(9)
-    doc.setTextColor(130, 130, 130)
-    doc.text(`Generado el ${todayLabel}`, marginX, y)
-
     y += 10
 
     if (sections.personal) {
-      addSectionTitle('Datos personales')
-
-      const lines = [
-        `Nombre: ${profile.full_name}`,
-        `Fecha de nacimiento: ${formatDate(profile.date_of_birth) || 'No especificada'}`,
-        `Tipo de sangre: ${profile.blood_type || 'No especificado'}`,
-        `Alergias: ${profile.allergies || 'Ninguna registrada'}`,
-        `Notas médicas importantes: ${profile.medical_notes || 'Ninguna'}`,
-        `Contacto de emergencia: ${
-          profile.emergency_contact_name
-            ? `${profile.emergency_contact_name}${
-                profile.emergency_contact_phone
-                  ? ` - ${profile.emergency_contact_phone}`
-                  : ''
-              }`
-            : 'No especificado'
-        }`,
-      ]
-
-      doc.setFontSize(10)
-      doc.setTextColor(40, 40, 40)
-      lines.forEach((line) => {
-        ensureSpace(7)
-        doc.text(line, marginX, y)
-        y += 6
-      })
+      // Paciente
+      doc.setFontSize(15)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...TEXT_DARK)
+      doc.text(toPdfText(profile.full_name), marginX, y)
       y += 6
+
+      doc.setFontSize(9.5)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(75, 85, 99)
+      doc.text(toPdfText(patientMeta), marginX, y)
+      y += 7
+
+      // Recuadro de información crítica (alergias y notas importantes)
+      const boxPadding = 4
+      const textWidth = contentWidth - boxPadding * 2
+      doc.setFontSize(9.5)
+      const wrapped = criticalInfo.map(
+        (item) =>
+          doc.splitTextToSize(toPdfText(item.value ?? ''), textWidth) as string[]
+      )
+      const lineHeight = 4.4
+      const boxHeight =
+        boxPadding * 2 +
+        wrapped.reduce((sum, lines) => sum + 4.5 + lines.length * lineHeight, 0) +
+        (wrapped.length - 1) * 2.5
+
+      ensureSpace(boxHeight + 4)
+      doc.setFillColor(254, 242, 242)
+      doc.setDrawColor(252, 165, 165)
+      doc.setLineWidth(0.3)
+      doc.roundedRect(marginX, y, contentWidth, boxHeight, 1.5, 1.5, 'FD')
+      doc.setFillColor(220, 38, 38)
+      doc.rect(marginX, y, 1.4, boxHeight, 'F')
+
+      let boxY = y + boxPadding + 3
+      criticalInfo.forEach((item, index) => {
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(185, 28, 28)
+        doc.text(item.label.toUpperCase(), marginX + boxPadding, boxY)
+        boxY += 4.5
+
+        doc.setFontSize(9.5)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(...TEXT_DARK)
+        doc.text(wrapped[index], marginX + boxPadding, boxY)
+        boxY += wrapped[index].length * lineHeight + 2.5
+      })
+      y += boxHeight + 6
+
+      // Contacto de emergencia
+      ensureSpace(8)
+      doc.setFontSize(9.5)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...TEXT_DARK)
+      const contactLabel = 'Contacto de emergencia: '
+      doc.text(contactLabel, marginX, y)
+      const contactLabelWidth = doc.getTextWidth(contactLabel)
+      doc.setFont('helvetica', 'normal')
+      doc.text(
+        toPdfText(formatEmergencyContact(profile)),
+        marginX + contactLabelWidth,
+        y
+      )
+      y += 12
     }
 
-    if (sections.medications) {
-      addSectionTitle('Medicamentos activos')
-
-      if (medications.length === 0) {
-        doc.setFontSize(10)
-        doc.setTextColor(130, 130, 130)
-        doc.text('Sin medicamentos activos.', marginX, y)
-        y += 10
+    tableSections.forEach((section) => {
+      if (!sections[section.key]) return
+      addSectionTitle(sectionLabels[section.key])
+      if (section.rows.length === 0) {
+        addEmptyMessage(section.empty)
       } else {
-        autoTable(doc, {
-          startY: y,
-          margin: { left: marginX, right: marginX },
-          head: [['Medicamento', 'Dosis', 'Frecuencia', 'Desde']],
-          body: medications.map((m) => [
-            m.name,
-            m.dose || '—',
-            m.frequency || '—',
-            formatDate(m.start_date) || '—',
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [29, 78, 216] },
-          styles: { fontSize: 9 },
-        })
-        y = getLastAutoTableFinalY(doc, y) + 10
+        addGroupedTable(section)
       }
-    }
+    })
 
-    if (sections.appointments) {
-      addSectionTitle('Últimas consultas')
-
-      if (appointments.length === 0) {
-        doc.setFontSize(10)
-        doc.setTextColor(130, 130, 130)
-        doc.text('Sin consultas registradas.', marginX, y)
-        y += 10
-      } else {
-        autoTable(doc, {
-          startY: y,
-          margin: { left: marginX, right: marginX },
-          head: [['Fecha', 'Especialidad', 'Médico', 'Diagnóstico']],
-          body: appointments.map((a) => [
-            formatDate(a.date) || '—',
-            a.specialty || '—',
-            a.doctors?.name || '—',
-            a.diagnosis || '—',
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [29, 78, 216] },
-          styles: { fontSize: 9 },
-        })
-        y = getLastAutoTableFinalY(doc, y) + 10
-      }
-    }
-
-    if (sections.diagnoses) {
-      addSectionTitle('Diagnósticos activos')
-
-      if (diagnoses.length === 0) {
-        doc.setFontSize(10)
-        doc.setTextColor(130, 130, 130)
-        doc.text('Sin diagnósticos activos.', marginX, y)
-        y += 10
-      } else {
-        autoTable(doc, {
-          startY: y,
-          margin: { left: marginX, right: marginX },
-          head: [['Diagnóstico', 'Tipo', 'Fecha']],
-          body: diagnoses.map((d) => [
-            d.name,
-            d.is_chronic ? 'Crónico' : 'Agudo',
-            formatDate(d.diagnosed_at) || '—',
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [29, 78, 216] },
-          styles: { fontSize: 9 },
-        })
-        y = getLastAutoTableFinalY(doc, y) + 10
-      }
-    }
-
-    if (sections.studies) {
-      addSectionTitle('Estudios recientes')
-
-      if (studies.length === 0) {
-        doc.setFontSize(10)
-        doc.setTextColor(130, 130, 130)
-        doc.text('Sin estudios registrados.', marginX, y)
-        y += 10
-      } else {
-        autoTable(doc, {
-          startY: y,
-          margin: { left: marginX, right: marginX },
-          head: [['Estudio', 'Tipo', 'Fecha']],
-          body: studies.map((s) => [
-            s.name,
-            (s.type && studyTypeLabels[s.type]) || s.type || '—',
-            formatDate(s.date) || '—',
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [29, 78, 216] },
-          styles: { fontSize: 9 },
-        })
-        y = getLastAutoTableFinalY(doc, y) + 10
-      }
-    }
-
-    if (sections.indicators) {
-      addSectionTitle('Indicadores de salud')
-
-      if (indicators.length === 0) {
-        doc.setFontSize(10)
-        doc.setTextColor(130, 130, 130)
-        doc.text('Sin indicadores registrados.', marginX, y)
-        y += 10
-      } else {
-        autoTable(doc, {
-          startY: y,
-          margin: { left: marginX, right: marginX },
-          head: [['Indicador', 'Último valor', 'Fecha']],
-          body: indicators.map((i) => [
-            indicatorTypeLabels[i.type] ?? i.type,
-            formatIndicatorValue(i),
-            formatDate(i.measured_at) || '—',
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [29, 78, 216] },
-          styles: { fontSize: 9 },
-        })
-        y = getLastAutoTableFinalY(doc, y) + 10
-      }
-    }
-
-    // Footer on every page
+    // Pie de página en todas las páginas
     const pageCount = doc.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i)
-      const pageHeight = doc.internal.pageSize.getHeight()
+
+      doc.setDrawColor(...ROW_BORDER)
+      doc.setLineWidth(0.3)
+      doc.line(marginX, pageHeight - 18, pageWidth - marginX, pageHeight - 18)
 
       doc.setFontSize(8)
-      doc.setTextColor(150, 150, 150)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(140, 140, 140)
       doc.text(
-        'VidaRecord — Tu historial médico. Siempre contigo.',
+        toPdfText(`VidaRecord — Resumen médico de ${profile.full_name}`),
         marginX,
-        pageHeight - 14
+        pageHeight - 13
       )
       doc.text(
         'Este resumen es informativo y no sustituye la evaluación de un profesional de salud.',
         marginX,
-        pageHeight - 10
+        pageHeight - 9
       )
-      doc.text(`Página ${i} de ${pageCount}`, pageWidth - marginX, pageHeight - 10, {
+      doc.text(`Página ${i} de ${pageCount}`, pageWidth - marginX, pageHeight - 13, {
         align: 'right',
       })
     }
@@ -434,6 +671,11 @@ export default function PdfGenerator({
           <p className="text-xs text-gray-400 text-center mt-2">
             El PDF se descargará directamente en tu dispositivo
           </p>
+          <p className="text-xs text-gray-500 mt-4 leading-relaxed">
+            Consejo: la descripción y las notas de cada diagnóstico, consulta
+            y medicamento se incluyen completas en el PDF. Mientras más
+            detalle escribas, mejor podrá entenderlo tu médico.
+          </p>
 
           {success && (
             <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 mt-3 text-center">
@@ -443,247 +685,108 @@ export default function PdfGenerator({
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6 md:p-8">
-          <div className="border-b-2 border-blue-700 pb-4 mb-6">
+          <div className="border-b-2 border-blue-700 pb-4 mb-6 flex items-end justify-between gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.jpg" alt="VidaRecord" className="h-12 w-auto" />
-            <p className="text-gray-600 mt-1">Resumen Médico Personal</p>
-            <p className="text-xs text-gray-400 mt-2">
-              Generado el {todayLabel}
-            </p>
+            <div className="text-right">
+              <p className="text-gray-700">Resumen Médico Personal</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Generado el {todayLabel}
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-7">
             {sections.personal && (
               <section>
-                <h3 className="text-sm font-semibold text-blue-700 mb-2">
-                  Datos personales
-                </h3>
-                <div className="text-sm text-gray-700 space-y-1">
-                  <p>Nombre: {profile.full_name}</p>
-                  <p>
-                    Fecha de nacimiento:{' '}
-                    {formatDate(profile.date_of_birth) || 'No especificada'}
-                  </p>
-                  <p>Tipo de sangre: {profile.blood_type || 'No especificado'}</p>
-                  <p>Alergias: {profile.allergies || 'Ninguna registrada'}</p>
-                  <p>
-                    Notas médicas importantes:{' '}
-                    {profile.medical_notes || 'Ninguna'}
-                  </p>
-                  <p>
-                    Contacto de emergencia:{' '}
-                    {profile.emergency_contact_name
-                      ? `${profile.emergency_contact_name}${
-                          profile.emergency_contact_phone
-                            ? ` - ${profile.emergency_contact_phone}`
-                            : ''
-                        }`
-                      : 'No especificado'}
-                  </p>
+                <p className="text-lg font-bold text-gray-800">
+                  {profile.full_name}
+                </p>
+                <p className="text-sm text-gray-600 mt-0.5">{patientMeta}</p>
+
+                <div className="mt-4 rounded-lg border border-red-200 border-l-4 border-l-red-600 bg-red-50 px-4 py-3 space-y-2.5">
+                  {criticalInfo.map((item) => (
+                    <div key={item.label}>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-red-700">
+                        {item.label}
+                      </p>
+                      <p className="text-sm text-gray-800 whitespace-pre-line">
+                        {item.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
+
+                <p className="text-sm text-gray-800 mt-3">
+                  <span className="font-semibold">Contacto de emergencia:</span>{' '}
+                  {formatEmergencyContact(profile)}
+                </p>
               </section>
             )}
 
-            {sections.medications && (
-              <section>
-                <h3 className="text-sm font-semibold text-blue-700 mb-2">
-                  Medicamentos activos
-                </h3>
-                {medications.length === 0 ? (
-                  <p className="text-sm text-gray-400">
-                    Sin medicamentos activos.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead>
-                        <tr className="text-xs text-gray-500 border-b border-gray-200">
-                          <th className="py-1.5 pr-3 font-medium">Medicamento</th>
-                          <th className="py-1.5 pr-3 font-medium">Dosis</th>
-                          <th className="py-1.5 pr-3 font-medium">Frecuencia</th>
-                          <th className="py-1.5 font-medium">Desde</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {medications.map((m) => (
-                          <tr key={m.id} className="border-b border-gray-100">
-                            <td className="py-1.5 pr-3 text-gray-700">{m.name}</td>
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {m.dose || '—'}
-                            </td>
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {m.frequency || '—'}
-                            </td>
-                            <td className="py-1.5 text-gray-500">
-                              {formatDate(m.start_date) || '—'}
-                            </td>
+            {tableSections.map((section) =>
+              sections[section.key] ? (
+                <section key={section.key}>
+                  <h3 className="text-sm font-semibold text-blue-700 border-b border-gray-200 pb-1 mb-2">
+                    {sectionLabels[section.key]}
+                  </h3>
+                  {section.rows.length === 0 ? (
+                    <p className="text-sm text-gray-400">{section.empty}</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead>
+                          <tr className="text-xs text-gray-500 border-b border-gray-200">
+                            {section.head.map((heading) => (
+                              <th key={heading} className="py-1.5 pr-3 font-medium">
+                                {heading}
+                              </th>
+                            ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {sections.appointments && (
-              <section>
-                <h3 className="text-sm font-semibold text-blue-700 mb-2">
-                  Últimas consultas
-                </h3>
-                {appointments.length === 0 ? (
-                  <p className="text-sm text-gray-400">
-                    Sin consultas registradas.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead>
-                        <tr className="text-xs text-gray-500 border-b border-gray-200">
-                          <th className="py-1.5 pr-3 font-medium">Fecha</th>
-                          <th className="py-1.5 pr-3 font-medium">Especialidad</th>
-                          <th className="py-1.5 pr-3 font-medium">Médico</th>
-                          <th className="py-1.5 font-medium">Diagnóstico</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {appointments.map((a) => (
-                          <tr key={a.id} className="border-b border-gray-100">
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {formatDate(a.date) || '—'}
-                            </td>
-                            <td className="py-1.5 pr-3 text-gray-700">
-                              {a.specialty || '—'}
-                            </td>
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {a.doctors?.name || '—'}
-                            </td>
-                            <td className="py-1.5 text-gray-500">
-                              {a.diagnosis || '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {sections.diagnoses && (
-              <section>
-                <h3 className="text-sm font-semibold text-blue-700 mb-2">
-                  Diagnósticos activos
-                </h3>
-                {diagnoses.length === 0 ? (
-                  <p className="text-sm text-gray-400">
-                    Sin diagnósticos activos.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead>
-                        <tr className="text-xs text-gray-500 border-b border-gray-200">
-                          <th className="py-1.5 pr-3 font-medium">Diagnóstico</th>
-                          <th className="py-1.5 pr-3 font-medium">Tipo</th>
-                          <th className="py-1.5 font-medium">Fecha</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {diagnoses.map((d) => (
-                          <tr key={d.id} className="border-b border-gray-100">
-                            <td className="py-1.5 pr-3 text-gray-700">{d.name}</td>
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {d.is_chronic ? 'Crónico' : 'Agudo'}
-                            </td>
-                            <td className="py-1.5 text-gray-500">
-                              {formatDate(d.diagnosed_at) || '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {sections.studies && (
-              <section>
-                <h3 className="text-sm font-semibold text-blue-700 mb-2">
-                  Estudios recientes
-                </h3>
-                {studies.length === 0 ? (
-                  <p className="text-sm text-gray-400">
-                    Sin estudios registrados.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead>
-                        <tr className="text-xs text-gray-500 border-b border-gray-200">
-                          <th className="py-1.5 pr-3 font-medium">Estudio</th>
-                          <th className="py-1.5 pr-3 font-medium">Tipo</th>
-                          <th className="py-1.5 font-medium">Fecha</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {studies.map((s) => (
-                          <tr key={s.id} className="border-b border-gray-100">
-                            <td className="py-1.5 pr-3 text-gray-700">{s.name}</td>
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {(s.type && studyTypeLabels[s.type]) || s.type || '—'}
-                            </td>
-                            <td className="py-1.5 text-gray-500">
-                              {formatDate(s.date) || '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {sections.indicators && (
-              <section>
-                <h3 className="text-sm font-semibold text-blue-700 mb-2">
-                  Indicadores de salud
-                </h3>
-                {indicators.length === 0 ? (
-                  <p className="text-sm text-gray-400">
-                    Sin indicadores registrados.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead>
-                        <tr className="text-xs text-gray-500 border-b border-gray-200">
-                          <th className="py-1.5 pr-3 font-medium">Indicador</th>
-                          <th className="py-1.5 pr-3 font-medium">Último valor</th>
-                          <th className="py-1.5 font-medium">Fecha</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {indicators.map((i) => (
-                          <tr key={i.type} className="border-b border-gray-100">
-                            <td className="py-1.5 pr-3 text-gray-700">
-                              {indicatorTypeLabels[i.type] ?? i.type}
-                            </td>
-                            <td className="py-1.5 pr-3 text-gray-500">
-                              {formatIndicatorValue(i)}
-                            </td>
-                            <td className="py-1.5 text-gray-500">
-                              {formatDate(i.measured_at) || '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
+                        </thead>
+                        {section.rows.map((row) => {
+                          const details = presentDetails(row.details)
+                          return (
+                            <tbody key={row.id} className="border-b border-gray-100">
+                              <tr className="align-top">
+                                {row.cells.map((cell, index) => (
+                                  <td
+                                    key={index}
+                                    className={`py-1.5 pr-3 whitespace-pre-line ${
+                                      index === 0
+                                        ? 'text-gray-800 font-medium'
+                                        : 'text-gray-500'
+                                    }`}
+                                  >
+                                    {cell}
+                                  </td>
+                                ))}
+                              </tr>
+                              {details.length > 0 && (
+                                <tr>
+                                  <td
+                                    colSpan={section.head.length}
+                                    className="pb-2 pr-3 text-xs text-gray-600 space-y-0.5"
+                                  >
+                                    {details.map((d) => (
+                                      <p key={d.label} className="whitespace-pre-line">
+                                        <span className="font-semibold text-gray-700">
+                                          {d.label}:
+                                        </span>{' '}
+                                        {d.value}
+                                      </p>
+                                    ))}
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          )
+                        })}
+                      </table>
+                    </div>
+                  )}
+                </section>
+              ) : null
             )}
           </div>
 
