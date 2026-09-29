@@ -19,6 +19,9 @@ export type Diagnosis = {
   doctors: { name: string } | null
 }
 
+// A partir de este largo la descripción se muestra recortada con "Ver más".
+const LONG_TEXT = 160
+
 function formatDate(dateStr: string | null) {
   if (!dateStr) return null
   return new Date(`${dateStr}T00:00:00`).toLocaleDateString('es-ES', {
@@ -32,22 +35,44 @@ export default function DiagnosisCard({
   diagnosis,
   onEdit,
   onDelete,
+  onToggleActive,
 }: {
   diagnosis: Diagnosis
   onEdit: (diagnosis: Diagnosis) => void
   onDelete: (id: string) => void
+  onToggleActive: (id: string, isActive: boolean) => void
 }) {
   const supabase = createClient()
   const [menuOpen, setMenuOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const date = formatDate(diagnosis.diagnosed_at)
+  const description = diagnosis.description?.trim() ?? ''
+  const notes = diagnosis.notes?.trim() ?? ''
+  const isLong = description.length > LONG_TEXT || Boolean(notes)
 
   const borderColor = !diagnosis.is_active
     ? 'border-gray-300'
     : diagnosis.is_chronic
       ? 'border-red-500'
       : 'border-orange-400'
+
+  const handleToggleActive = async () => {
+    setMenuOpen(false)
+    const isActive = !diagnosis.is_active
+    const { error } = await supabase
+      .from('diagnoses')
+      .update({ is_active: isActive })
+      .eq('id', diagnosis.id)
+
+    if (error) {
+      window.alert('No se pudo actualizar el diagnóstico. Intenta de nuevo.')
+      return
+    }
+
+    onToggleActive(diagnosis.id, isActive)
+  }
 
   const handleDelete = async () => {
     setMenuOpen(false)
@@ -74,44 +99,74 @@ export default function DiagnosisCard({
 
   return (
     <div
-      className={`relative bg-white rounded-xl shadow-sm p-5 border-l-4 ${borderColor}`}
+      className={`relative bg-white rounded-xl shadow-sm p-5 border-l-4 ${borderColor} ${
+        diagnosis.is_active ? '' : 'opacity-80'
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center flex-wrap gap-2">
             <p className="text-lg font-bold text-gray-800">{diagnosis.name}</p>
-            {diagnosis.is_chronic && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">
-                Crónico
-              </span>
-            )}
             <span
               className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                diagnosis.is_active
+                diagnosis.is_chronic
                   ? 'bg-red-100 text-red-700'
-                  : 'bg-gray-100 text-gray-500'
+                  : 'bg-orange-100 text-orange-700'
               }`}
             >
-              {diagnosis.is_active ? 'Activo' : 'Resuelto'}
+              {diagnosis.is_chronic ? 'Crónico' : 'Agudo'}
             </span>
+            {!diagnosis.is_active && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                Resuelto
+              </span>
+            )}
           </div>
 
-          {diagnosis.description && (
-            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-              {diagnosis.description}
+          <p className="text-sm text-gray-500 mt-1">
+            {[date, diagnosis.doctors?.name && `Dr(a). ${diagnosis.doctors.name}`]
+              .filter(Boolean)
+              .join(' · ') || 'Sin fecha ni médico registrados'}
+          </p>
+
+          {description ? (
+            <p
+              className={`text-sm text-gray-700 mt-2 whitespace-pre-line ${
+                expanded ? '' : 'line-clamp-3'
+              }`}
+            >
+              {description}
             </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onEdit(diagnosis)}
+              className="mt-2 w-full rounded-lg border border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-left text-sm text-amber-900 hover:bg-amber-100"
+            >
+              <span className="font-semibold">Sin descripción.</span> Explica qué
+              significa y qué valores tenías: es lo que tu médico leerá en el
+              Resumen PDF. <span className="font-semibold">Agregar →</span>
+            </button>
           )}
 
-          {diagnosis.doctors?.name && (
-            <p className="text-sm text-gray-500 mt-1">
-              Diagnosticado por {diagnosis.doctors.name}
-            </p>
+          {expanded && notes && (
+            <div className="mt-3 rounded-lg bg-gray-50 px-3 py-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Notas
+              </p>
+              <p className="text-sm text-gray-700 whitespace-pre-line">{notes}</p>
+            </div>
           )}
 
-          {date && <p className="text-sm text-gray-500 mt-1">{date}</p>}
-
-          {diagnosis.notes && (
-            <p className="text-xs text-gray-400 mt-2">{diagnosis.notes}</p>
+          {isLong && (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              aria-expanded={expanded}
+              className="mt-2 text-sm font-semibold text-blue-700 hover:text-blue-800"
+            >
+              {expanded ? 'Ver menos' : notes ? 'Ver más y notas' : 'Ver más'}
+            </button>
           )}
         </div>
 
@@ -138,7 +193,7 @@ export default function DiagnosisCard({
                 className="fixed inset-0 z-10"
                 onClick={() => setMenuOpen(false)}
               />
-              <div className="absolute right-0 top-9 z-20 w-36 bg-white rounded-lg shadow-lg border border-gray-100 py-1">
+              <div className="absolute right-0 top-9 z-20 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -148,6 +203,13 @@ export default function DiagnosisCard({
                   className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
                   Editar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleToggleActive}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  {diagnosis.is_active ? 'Marcar como resuelto' : 'Volver a activar'}
                 </button>
                 <button
                   type="button"

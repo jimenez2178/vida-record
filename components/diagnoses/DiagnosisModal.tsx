@@ -152,9 +152,13 @@ export default function DiagnosisModal({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ej: Hipertensión, Diabetes tipo 2, Gastritis"
+                placeholder="Ej: Hipertensión, Diabetes tipo 2, Anemia leve"
                 className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Un nombre corto. Los valores y la explicación van en la
+                descripción.
+              </p>
             </div>
 
             <div>
@@ -166,11 +170,16 @@ export default function DiagnosisModal({
               </label>
               <textarea
                 id="description"
-                rows={3}
+                rows={5}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
+                placeholder="Ej: Hemoglobina 13.4 g/dL, un poco por debajo de lo normal. El médico indicó hierro por 3 meses y repetir el análisis."
+                className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Incluye valores, qué significa y qué indicó el médico. Aparece
+                completa en tu Resumen PDF.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

@@ -108,6 +108,7 @@ export default function StudyCard({
   const [analyzeError, setAnalyzeError] = useState('')
   const [aiProcessed, setAiProcessed] = useState(study.ai_processed)
   const [aiSummary, setAiSummary] = useState(study.ai_summary)
+  const [summaryOpen, setSummaryOpen] = useState(false)
 
   const config = typeConfig[study.type ?? 'otro']
   const date = formatDate(study.date)
@@ -146,6 +147,10 @@ export default function StudyCard({
   const handleViewFile = async () => {
     if (!study.file_url) return
 
+    // La pestaña se abre antes del await: si se abre después, Safari y otros
+    // navegadores la bloquean como ventana emergente.
+    const tab = window.open('', '_blank')
+
     setOpening(true)
     const { data, error } = await supabase.storage
       .from('medical-documents')
@@ -153,11 +158,17 @@ export default function StudyCard({
     setOpening(false)
 
     if (error || !data) {
+      tab?.close()
       window.alert('No se pudo abrir el documento. Intenta de nuevo.')
       return
     }
 
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+    if (tab) {
+      tab.opener = null
+      tab.location.href = data.signedUrl
+    } else {
+      window.location.href = data.signedUrl
+    }
   }
 
   const handleDelete = async () => {
@@ -170,17 +181,19 @@ export default function StudyCard({
 
     setDeleting(true)
 
-    if (study.file_url) {
-      await supabase.storage.from('medical-documents').remove([study.file_url])
-    }
-
+    // Primero el registro: si falla, el archivo sigue intacto.
     const { error } = await supabase.from('studies').delete().eq('id', study.id)
-    setDeleting(false)
 
     if (error) {
+      setDeleting(false)
       window.alert('No se pudo eliminar el estudio. Intenta de nuevo.')
       return
     }
+
+    if (study.file_url) {
+      await supabase.storage.from('medical-documents').remove([study.file_url])
+    }
+    setDeleting(false)
 
     onDelete(study.id)
   }
@@ -205,7 +218,7 @@ export default function StudyCard({
           </div>
 
           <div className="min-w-0">
-            <p className="text-base font-bold text-gray-800 truncate">
+            <p className="text-base font-bold text-gray-800 break-words">
               {study.name}
             </p>
             <span
@@ -217,6 +230,11 @@ export default function StudyCard({
             {study.doctors?.name && (
               <p className="text-sm text-gray-500">
                 Ordenado por {study.doctors.name}
+              </p>
+            )}
+            {study.notes?.trim() && (
+              <p className="text-sm text-gray-700 mt-2 whitespace-pre-line">
+                {study.notes}
               </p>
             )}
           </div>
@@ -348,6 +366,16 @@ export default function StudyCard({
             🔒 Análisis IA — Solo Premium
           </Link>
         )}
+
+        {!study.file_url && (
+          <button
+            type="button"
+            onClick={() => onEdit(study)}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 border border-dashed border-gray-300 hover:bg-gray-50 rounded-lg px-3 py-1.5 transition-colors"
+          >
+            📎 Sin archivo · Adjuntar documento
+          </button>
+        )}
       </div>
 
       {analyzeError && (
@@ -355,21 +383,38 @@ export default function StudyCard({
       )}
 
       {study.file_url && isPremium && aiProcessed && aiSummary && (
-        <div className="bg-blue-50 rounded-lg p-3 mt-2">
+        <div className="bg-blue-50 rounded-lg p-3 mt-3">
           <p className="text-xs font-bold text-gray-700 mb-1">
-            📋 Resumen IA:
+            📋 Resumen IA
           </p>
-          <div className="prose prose-sm max-w-none text-gray-700">
-            <ReactMarkdown>{aiSummary}</ReactMarkdown>
-          </div>
-          <button
-            type="button"
-            onClick={handleAnalyze}
-            disabled={analyzing}
-            className="mt-2 text-xs font-medium text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-60 rounded-lg px-2.5 py-1 transition-colors"
+          <div
+            className={`relative prose prose-sm max-w-none text-gray-700 ${
+              summaryOpen ? '' : 'max-h-28 overflow-hidden'
+            }`}
           >
-            {analyzing ? 'Analizando...' : 'Volver a analizar'}
-          </button>
+            <ReactMarkdown>{aiSummary}</ReactMarkdown>
+            {!summaryOpen && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-blue-50 to-transparent" />
+            )}
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSummaryOpen((v) => !v)}
+              aria-expanded={summaryOpen}
+              className="text-sm font-semibold text-blue-700 hover:text-blue-800"
+            >
+              {summaryOpen ? 'Ocultar resumen' : 'Leer resumen completo'}
+            </button>
+            <button
+              type="button"
+              onClick={handleAnalyze}
+              disabled={analyzing}
+              className="ml-auto text-xs font-medium text-gray-500 hover:text-gray-700 bg-white/70 hover:bg-white disabled:opacity-60 rounded-lg px-2.5 py-1 transition-colors"
+            >
+              {analyzing ? 'Analizando...' : 'Volver a analizar'}
+            </button>
+          </div>
         </div>
       )}
     </div>

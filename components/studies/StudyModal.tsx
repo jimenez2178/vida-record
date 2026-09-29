@@ -54,6 +54,15 @@ export default function StudyModal({
 
     setError('')
     setFile(selected)
+
+    // Propone un nombre a partir del archivo si todavía no hay uno.
+    if (!name.trim()) {
+      const baseName = selected.name
+        .replace(/\.[^.]+$/, '')
+        .replace(/[_-]+/g, ' ')
+        .trim()
+      if (baseName) setName(baseName.charAt(0).toUpperCase() + baseName.slice(1))
+    }
   }
 
   const handleViewCurrentFile = async () => {
@@ -150,6 +159,8 @@ export default function StudyModal({
       file_url: filePath,
       file_type: fileType,
       notes: notes.trim() || null,
+      // Un archivo nuevo invalida el resumen de IA del anterior.
+      ...(file ? { ai_summary: null, ai_processed: false } : {}),
     }
 
     const { error: saveError } = study
