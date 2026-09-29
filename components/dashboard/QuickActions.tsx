@@ -34,7 +34,7 @@ export default function QuickActions({
           type="button"
           onClick={() => setOpenModal('cita')}
           disabled={!canAdd.appointments}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
             +
@@ -45,7 +45,7 @@ export default function QuickActions({
           type="button"
           onClick={() => setOpenModal('medicamento')}
           disabled={!canAdd.medications}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
             +
@@ -56,7 +56,7 @@ export default function QuickActions({
           type="button"
           onClick={() => setOpenModal('estudio')}
           disabled={!canAdd.studies}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
             +
@@ -66,7 +66,7 @@ export default function QuickActions({
         <button
           type="button"
           onClick={() => setOpenModal('medicion')}
-          className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all"
+          className="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 active:scale-95 text-white rounded-xl shadow-md hover:shadow-lg py-3.5 px-4 text-sm font-semibold transition-all"
         >
           <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs leading-none shrink-0">
             +

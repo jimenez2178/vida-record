@@ -16,11 +16,11 @@ export default function HealthSummaryCard({
 }) {
   const { percent, missing } = completeness
   const barColor =
-    percent === 100 ? 'bg-green-500' : percent >= 60 ? 'bg-teal-500' : 'bg-amber-500'
+    percent === 100 ? 'bg-emerald-500' : percent >= 60 ? 'bg-blue-500' : 'bg-amber-500'
 
   return (
     <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-      <p className="text-base font-bold text-teal-800">Tu resumen médico</p>
+      <p className="text-base font-bold text-blue-800">Tu resumen médico</p>
 
       <div className="mt-3">
         <div className="flex items-baseline justify-between">
@@ -42,7 +42,7 @@ export default function HealthSummaryCard({
             Falta: {missing.join(', ')}.{' '}
             <Link
               href={profileHref}
-              className="font-semibold text-teal-700 hover:text-teal-800"
+              className="font-semibold text-blue-700 hover:text-blue-800"
             >
               Completar
             </Link>
@@ -56,7 +56,7 @@ export default function HealthSummaryCard({
 
       <Link
         href="/resumen-pdf"
-        className="mt-5 flex items-center justify-center gap-2 rounded-lg bg-teal-600 hover:bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors"
+        className="mt-5 flex items-center justify-center gap-2 rounded-lg bg-blue-700 hover:bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors"
       >
         📄 Resumen PDF para tu médico
         {!isPremium && (

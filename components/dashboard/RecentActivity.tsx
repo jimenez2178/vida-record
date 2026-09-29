@@ -30,10 +30,10 @@ export default function RecentActivity({ items }: { items: ActivityItem[] }) {
   return (
     <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between gap-4 mb-4">
-        <p className="text-base font-bold text-teal-800">Actividad reciente</p>
+        <p className="text-base font-bold text-blue-800">Actividad reciente</p>
         <Link
           href="/historial"
-          className="text-sm font-semibold text-teal-700 hover:text-teal-800"
+          className="text-sm font-semibold text-blue-700 hover:text-blue-800"
         >
           Historial →
         </Link>
@@ -57,7 +57,7 @@ export default function RecentActivity({ items }: { items: ActivityItem[] }) {
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                     {config.label} · {timeAgo(item.createdAt)}
                   </p>
-                  <p className="text-sm font-medium text-gray-900 group-hover:text-teal-700 truncate">
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-blue-700 truncate">
                     {item.title}
                   </p>
                 </Link>

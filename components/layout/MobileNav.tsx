@@ -51,7 +51,7 @@ export default function MobileNav({
               ⭐ Plan Premium
             </span>
           ) : (
-            <span className="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-teal-600 text-white">
+            <span className="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-600 text-white">
               Plan Gratuito
             </span>
           )}

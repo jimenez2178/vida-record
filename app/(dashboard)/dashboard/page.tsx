@@ -39,14 +39,14 @@ const SPARKLINE_READINGS = 8
 const ACTIVITY_ITEMS = 6
 
 const cardClass =
-  'group bg-white border border-gray-200 rounded-xl shadow-sm p-6 transition-all hover:border-teal-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500'
+  'group bg-white border border-gray-200 rounded-xl shadow-sm p-6 transition-all hover:border-blue-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
 
 function CardTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="flex items-center justify-between text-base font-bold text-teal-800">
+    <p className="flex items-center justify-between text-base font-bold text-blue-800">
       {children}
       <span
-        className="text-teal-600 opacity-0 transition-opacity group-hover:opacity-100"
+        className="text-blue-600 opacity-0 transition-opacity group-hover:opacity-100"
         aria-hidden="true"
       >
         →
@@ -294,7 +294,7 @@ export default async function DashboardPage() {
               <p className="mt-2 text-xl font-bold text-gray-900">
                 Sin citas programadas
               </p>
-              <p className="text-sm font-semibold text-teal-700 mt-3">
+              <p className="text-sm font-semibold text-blue-700 mt-3">
                 Agenda tu próxima cita →
               </p>
             </>
@@ -328,7 +328,7 @@ export default async function DashboardPage() {
               <p className="mt-2 text-xl font-bold text-gray-900">
                 Sin medicamentos activos
               </p>
-              <p className="text-sm font-semibold text-teal-700 mt-3">
+              <p className="text-sm font-semibold text-blue-700 mt-3">
                 Agregar medicamento →
               </p>
             </>
@@ -357,7 +357,7 @@ export default async function DashboardPage() {
               <p className="mt-2 text-xl font-bold text-gray-900">
                 Sin estudios registrados
               </p>
-              <p className="text-sm font-semibold text-teal-700 mt-3">
+              <p className="text-sm font-semibold text-blue-700 mt-3">
                 Subir un estudio →
               </p>
             </>

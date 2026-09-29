@@ -9,7 +9,7 @@ import {
 } from '@/lib/dashboard/indicators'
 
 const toneStyles: Record<IndicatorTone, string> = {
-  good: 'bg-green-100 text-green-800',
+  good: 'bg-emerald-100 text-emerald-800',
   warn: 'bg-amber-100 text-amber-800',
   bad: 'bg-red-100 text-red-800',
 }
@@ -26,7 +26,7 @@ export default function IndicatorSummary({
     return (
       <>
         <p className="mt-2 text-xl font-bold text-gray-900">Sin registros</p>
-        <p className="text-sm font-semibold text-teal-700 mt-3">
+        <p className="text-sm font-semibold text-blue-700 mt-3">
           Registra tu primera medición →
         </p>
       </>
@@ -41,7 +41,7 @@ export default function IndicatorSummary({
       values: chronological
         .map((r) => r.value_primary)
         .filter((v): v is number => v !== null),
-      className: 'text-teal-600',
+      className: 'text-blue-600',
     },
     ...(isPressure
       ? [
@@ -49,7 +49,7 @@ export default function IndicatorSummary({
             values: chronological
               .map((r) => r.value_secondary)
               .filter((v): v is number => v !== null),
-            className: 'text-teal-300',
+            className: 'text-blue-300',
           },
         ]
       : []),

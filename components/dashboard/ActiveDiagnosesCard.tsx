@@ -28,7 +28,7 @@ export default function ActiveDiagnosesCard({
   return (
     <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between gap-4 mb-4">
-        <p className="text-base font-bold text-teal-800">
+        <p className="text-base font-bold text-blue-800">
           Diagnósticos activos
           {diagnoses.length > 0 && (
             <span className="ml-2 text-sm font-medium text-gray-500">
@@ -38,7 +38,7 @@ export default function ActiveDiagnosesCard({
         </p>
         <Link
           href="/diagnosticos"
-          className="text-sm font-semibold text-teal-700 hover:text-teal-800"
+          className="text-sm font-semibold text-blue-700 hover:text-blue-800"
         >
           {diagnoses.length > 0 ? 'Ver todos →' : 'Agregar diagnóstico →'}
         </Link>

@@ -17,16 +17,16 @@ const levelStyles: Record<
   },
   info: {
     row: 'bg-white border-gray-200',
-    dot: 'bg-teal-500',
-    cta: 'text-teal-700 hover:text-teal-800',
+    dot: 'bg-blue-500',
+    cta: 'text-blue-700 hover:text-blue-800',
   },
 }
 
 export default function AttentionPanel({ items }: { items: AttentionItem[] }) {
   if (items.length === 0) {
     return (
-      <section className="mb-8 flex items-center gap-3 rounded-xl border border-teal-200 bg-teal-50 px-5 py-4">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-600 text-white">
+      <section className="mb-8 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -40,8 +40,8 @@ export default function AttentionPanel({ items }: { items: AttentionItem[] }) {
           </svg>
         </span>
         <div>
-          <p className="font-semibold text-teal-900">Todo al día</p>
-          <p className="text-sm text-teal-800">
+          <p className="font-semibold text-emerald-900">Todo al día</p>
+          <p className="text-sm text-emerald-800">
             No hay nada pendiente en tu historial por ahora.
           </p>
         </div>
