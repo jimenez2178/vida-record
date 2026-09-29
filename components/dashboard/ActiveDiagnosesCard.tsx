@@ -26,7 +26,7 @@ export default function ActiveDiagnosesCard({
   const visible = diagnoses.slice(0, MAX_VISIBLE)
 
   return (
-    <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-8">
+    <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between gap-4 mb-4">
         <p className="text-base font-bold text-teal-800">
           Diagnósticos activos

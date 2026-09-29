@@ -268,9 +268,10 @@ export default async function DashboardLayout({
             Configuración
           </Link>
 
-          <p className="px-3 pb-2 text-sm text-white/80 truncate">
-            {displayName}
-          </p>
+          <div className="px-3 pt-1 pb-2">
+            <p className="text-xs text-white/60">Sesión iniciada como</p>
+            <p className="text-sm text-white/90 truncate">{displayName}</p>
+          </div>
           <form action={signOut}>
             <button
               type="submit"

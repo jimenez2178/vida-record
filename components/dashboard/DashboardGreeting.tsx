@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 function getGreeting(date: Date) {
   const hour = date.getHours()
@@ -19,16 +19,19 @@ function getTodayLabel(date: Date) {
   return label.charAt(0).toUpperCase() + label.slice(1)
 }
 
+const subscribe = () => () => {}
+// Redondeado al minuto para que el valor sea estable entre renders.
+const getMinute = () => Math.floor(Date.now() / 60_000)
+// En el servidor no conocemos la hora local del usuario.
+const getServerMinute = () => null
+
 export default function DashboardGreeting({
   displayName,
 }: {
   displayName: string
 }) {
-  const [now, setNow] = useState<Date | null>(null)
-
-  useEffect(() => {
-    setNow(new Date())
-  }, [])
+  const minute = useSyncExternalStore(subscribe, getMinute, getServerMinute)
+  const now = minute === null ? null : new Date(minute * 60_000)
 
   return (
     <header className="mb-6">

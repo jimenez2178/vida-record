@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getActiveProfileId } from '@/lib/profiles/getActiveProfileId'
 import QuickActions from '@/components/dashboard/QuickActions'
@@ -6,47 +7,18 @@ import AttentionPanel from '@/components/dashboard/AttentionPanel'
 import ActiveDiagnosesCard, {
   type DashboardDiagnosis,
 } from '@/components/dashboard/ActiveDiagnosesCard'
+import IndicatorSummary from '@/components/dashboard/IndicatorSummary'
+import RecentActivity, {
+  type ActivityItem,
+} from '@/components/dashboard/RecentActivity'
+import HealthSummaryCard from '@/components/dashboard/HealthSummaryCard'
 import { buildAttentionItems } from '@/lib/dashboard/attention'
-
-function todayDateString() {
-  const now = new Date()
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
-}
-
-function formatDate(dateStr: string) {
-  return new Date(`${dateStr}T00:00:00`).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
-
-const indicatorTypeLabels: Record<string, string> = {
-  presion: 'Presión arterial',
-  glucosa: 'Glucosa',
-  peso: 'Peso',
-  temperatura: 'Temperatura',
-  frecuencia_cardiaca: 'Frecuencia cardíaca',
-  colesterol: 'Colesterol',
-  otro: 'Otro',
-}
-
-function formatIndicatorValue(indicator: {
-  type: string
-  value_primary: number | null
-  value_secondary: number | null
-  unit: string | null
-}) {
-  if (indicator.type === 'presion') {
-    return `${indicator.value_primary}/${indicator.value_secondary}${
-      indicator.unit ? ` ${indicator.unit}` : ''
-    }`
-  }
-  return `${indicator.value_primary}${
-    indicator.unit ? ` ${indicator.unit}` : ''
-  }`
-}
+import { formatDate, timeAgo, todayDateString } from '@/lib/dashboard/dates'
+import {
+  formatIndicatorValue,
+  indicatorTypeLabels,
+  type IndicatorReading,
+} from '@/lib/dashboard/indicators'
 
 type NextAppointment = {
   id: string
@@ -63,11 +35,24 @@ type RecentStudy = {
   date: string | null
 }
 
-type LastIndicator = {
-  type: string
-  value_primary: number | null
-  value_secondary: number | null
-  unit: string | null
+const SPARKLINE_READINGS = 8
+const ACTIVITY_ITEMS = 6
+
+const cardClass =
+  'group bg-white border border-gray-200 rounded-xl shadow-sm p-6 transition-all hover:border-teal-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500'
+
+function CardTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-center justify-between text-base font-bold text-teal-800">
+      {children}
+      <span
+        className="text-teal-600 opacity-0 transition-opacity group-hover:opacity-100"
+        aria-hidden="true"
+      >
+        →
+      </span>
+    </p>
+  )
 }
 
 export default async function DashboardPage() {
@@ -110,12 +95,14 @@ export default async function DashboardPage() {
     { data: nextAppointment },
     { data: activeMedications },
     { data: recentStudies },
-    { data: lastIndicator },
+    { data: recentIndicators },
     { data: userRow },
     { data: profile },
     { data: activeDiagnoses },
     { data: unanalyzedStudies },
     { data: lastBloodPressure },
+    { data: recentAppointments },
+    { data: recentDiagnoses },
   ] = await Promise.all([
     supabase
       .from('appointments')
@@ -129,27 +116,28 @@ export default async function DashboardPage() {
       .maybeSingle(),
     supabase
       .from('medications')
-      .select('id, name, quantity_remaining, start_date')
+      .select('id, name, dose, quantity_remaining, start_date, created_at')
       .eq('profile_id', profileId)
       .eq('is_active', true)
       .order('created_at', { ascending: false }),
     supabase
       .from('studies')
-      .select('id, name, type, date')
+      .select('id, name, type, date, created_at')
       .eq('profile_id', profileId)
       .order('created_at', { ascending: false })
-      .limit(2),
+      .limit(5),
     supabase
       .from('health_indicators')
-      .select('type, value_primary, value_secondary, unit')
+      .select('id, type, value_primary, value_secondary, unit, measured_at, created_at')
       .eq('profile_id', profileId)
       .order('measured_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .limit(40),
     supabase.from('users').select('plan').eq('id', user.id).single(),
     supabase
       .from('profiles')
-      .select('date_of_birth, blood_type, emergency_contact_name, is_owner')
+      .select(
+        'date_of_birth, gender, blood_type, allergies, medical_notes, emergency_contact_name, emergency_contact_phone, is_owner'
+      )
       .eq('id', profileId)
       .maybeSingle(),
     supabase
@@ -172,20 +160,42 @@ export default async function DashboardPage() {
       .order('measured_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('appointments')
+      .select('id, specialty, created_at')
+      .eq('profile_id', profileId)
+      .order('created_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('diagnoses')
+      .select('id, name, created_at')
+      .eq('profile_id', profileId)
+      .order('created_at', { ascending: false })
+      .limit(5),
   ])
 
+  const isPremium = userRow?.plan === 'premium'
+  const profileHref = profile?.is_owner === false ? '/familia' : '/perfil'
+
   const appointment = nextAppointment as NextAppointment | null
-  const studies = (recentStudies as RecentStudy[] | null) ?? []
-  const indicator = lastIndicator as LastIndicator | null
+  const studies = ((recentStudies as RecentStudy[] | null) ?? []).slice(0, 2)
   const medications = activeMedications ?? []
-  const medicationNames = medications.slice(0, 3).map((m) => m.name)
-  const medicationCount = medications.length
   const diagnoses = (activeDiagnoses as DashboardDiagnosis[] | null) ?? []
+
+  // Lecturas del último tipo de indicador medido, para la tendencia.
+  const indicators = (recentIndicators ?? []) as (IndicatorReading & {
+    id: string
+    created_at: string
+  })[]
+  const latestType = indicators[0]?.type
+  const indicatorReadings = indicators
+    .filter((i) => i.type === latestType)
+    .slice(0, SPARKLINE_READINGS)
 
   const attentionItems = buildAttentionItems({
     today,
-    profileHref: profile?.is_owner === false ? '/familia' : '/perfil',
-    isPremium: userRow?.plan === 'premium',
+    profileHref,
+    isPremium,
     profile: profile ?? null,
     nextAppointment: appointment,
     medications,
@@ -193,6 +203,62 @@ export default async function DashboardPage() {
     unanalyzedStudies: unanalyzedStudies ?? [],
     lastBloodPressure: lastBloodPressure ?? null,
   })
+
+  const profileFields: [string, unknown][] = [
+    ['fecha de nacimiento', profile?.date_of_birth],
+    ['sexo', profile?.gender],
+    ['tipo de sangre', profile?.blood_type],
+    ['alergias (escribe "Ninguna" si no tienes)', profile?.allergies],
+    ['notas médicas', profile?.medical_notes],
+    ['contacto de emergencia', profile?.emergency_contact_name],
+    ['teléfono de emergencia', profile?.emergency_contact_phone],
+  ]
+  const missingFields = profileFields
+    .filter(([, value]) => !(typeof value === 'string' && value.trim()))
+    .map(([label]) => label)
+  const completeness = {
+    percent: Math.round(
+      ((profileFields.length - missingFields.length) / profileFields.length) * 100
+    ),
+    missing: missingFields,
+  }
+
+  const activity: ActivityItem[] = [
+    ...(recentAppointments ?? []).map((a) => ({
+      id: a.id,
+      kind: 'consulta' as const,
+      title: a.specialty || 'Consulta médica',
+      createdAt: a.created_at,
+    })),
+    ...medications.slice(0, 5).map((m) => ({
+      id: m.id,
+      kind: 'medicamento' as const,
+      title: m.name,
+      createdAt: m.created_at,
+    })),
+    ...((recentStudies ?? []) as (RecentStudy & { created_at: string })[]).map(
+      (s) => ({
+        id: s.id,
+        kind: 'estudio' as const,
+        title: s.name,
+        createdAt: s.created_at,
+      })
+    ),
+    ...(recentDiagnoses ?? []).map((d) => ({
+      id: d.id,
+      kind: 'diagnostico' as const,
+      title: d.name,
+      createdAt: d.created_at,
+    })),
+    ...indicators.slice(0, 5).map((i) => ({
+      id: i.id,
+      kind: 'medicion' as const,
+      title: `${indicatorTypeLabels[i.type] ?? i.type}: ${formatIndicatorValue(i)}`,
+      createdAt: i.created_at,
+    })),
+  ]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, ACTIVITY_ITEMS)
 
   return (
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
@@ -206,8 +272,8 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-base font-bold text-teal-800">Próxima cita</p>
+        <Link href="/citas" className={cardClass}>
+          <CardTitle>Próxima cita</CardTitle>
           {appointment ? (
             <>
               <p className="mt-2 text-xl font-bold text-gray-900">
@@ -220,38 +286,57 @@ export default async function DashboardPage() {
               )}
               <p className="text-base font-medium text-gray-700 mt-1">
                 {formatDate(appointment.date)}
+                {appointment.time && ` · ${appointment.time.slice(0, 5)}`}
               </p>
             </>
           ) : (
-            <p className="mt-2 text-xl font-bold text-gray-900">
-              Sin citas programadas
-            </p>
-          )}
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-base font-bold text-teal-800">
-            Medicamentos activos
-          </p>
-          {medicationCount > 0 ? (
             <>
               <p className="mt-2 text-xl font-bold text-gray-900">
-                {medicationCount}{' '}
-                {medicationCount === 1 ? 'medicamento' : 'medicamentos'}
+                Sin citas programadas
               </p>
-              <p className="text-base font-medium text-gray-700 mt-1 truncate">
-                {medicationNames.join(', ')}
+              <p className="text-sm font-semibold text-teal-700 mt-3">
+                Agenda tu próxima cita →
               </p>
             </>
-          ) : (
-            <p className="mt-2 text-xl font-bold text-gray-900">
-              Sin medicamentos activos
-            </p>
           )}
-        </div>
+        </Link>
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-base font-bold text-teal-800">Últimos estudios</p>
+        <Link href="/medicamentos" className={cardClass}>
+          <CardTitle>Medicamentos activos</CardTitle>
+          {medications.length > 0 ? (
+            <>
+              <p className="mt-2 text-xl font-bold text-gray-900">
+                {medications.length}{' '}
+                {medications.length === 1 ? 'medicamento' : 'medicamentos'}
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {medications.slice(0, 3).map((m) => (
+                  <li key={m.id} className="text-sm leading-snug">
+                    <span className="font-semibold text-gray-800">{m.name}</span>
+                    {m.dose && <span className="text-gray-500"> · {m.dose}</span>}
+                  </li>
+                ))}
+              </ul>
+              {medications.length > 3 && (
+                <p className="text-sm text-gray-500 mt-1.5">
+                  y {medications.length - 3} más
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-xl font-bold text-gray-900">
+                Sin medicamentos activos
+              </p>
+              <p className="text-sm font-semibold text-teal-700 mt-3">
+                Agregar medicamento →
+              </p>
+            </>
+          )}
+        </Link>
+
+        <Link href="/estudios" className={cardClass}>
+          <CardTitle>Últimos estudios</CardTitle>
           {studies.length > 0 ? (
             <div className="mt-2 space-y-2">
               {studies.map((s) => (
@@ -260,40 +345,44 @@ export default async function DashboardPage() {
                     {s.name}
                   </p>
                   {s.date && (
-                    <p className="text-base font-medium text-gray-700">
-                      {formatDate(s.date)}
+                    <p className="text-sm font-medium text-gray-600">
+                      {formatDate(s.date)} · {timeAgo(s.date)}
                     </p>
                   )}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-xl font-bold text-gray-900">
-              Sin estudios registrados
-            </p>
-          )}
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <p className="text-base font-bold text-teal-800">Indicadores</p>
-          {indicator ? (
             <>
               <p className="mt-2 text-xl font-bold text-gray-900">
-                {formatIndicatorValue(indicator)}
+                Sin estudios registrados
               </p>
-              <p className="text-base font-medium text-gray-700 mt-1">
-                {indicatorTypeLabels[indicator.type] ?? indicator.type}
+              <p className="text-sm font-semibold text-teal-700 mt-3">
+                Subir un estudio →
               </p>
             </>
-          ) : (
-            <p className="mt-2 text-xl font-bold text-gray-900">
-              Sin registros
-            </p>
           )}
-        </div>
+        </Link>
+
+        <Link href="/indicadores" className={cardClass}>
+          <CardTitle>Indicadores</CardTitle>
+          <IndicatorSummary readings={indicatorReadings} />
+        </Link>
       </section>
 
-      <ActiveDiagnosesCard diagnoses={diagnoses} />
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        <div className="lg:col-span-2">
+          <ActiveDiagnosesCard diagnoses={diagnoses} />
+        </div>
+        <div className="space-y-4">
+          <HealthSummaryCard
+            completeness={completeness}
+            profileHref={profileHref}
+            isPremium={isPremium}
+          />
+          <RecentActivity items={activity} />
+        </div>
+      </section>
     </div>
   )
 }

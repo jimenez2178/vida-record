@@ -59,7 +59,7 @@ export default function SidebarNav({
   }
 
   return (
-    <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+    <nav className="flex-1 px-3 space-y-1 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.2)_transparent]">
       {showSwitcher && activeProfile && (
         <div className="relative mb-3">
           <button
