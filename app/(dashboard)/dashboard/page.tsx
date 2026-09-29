@@ -2,6 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import { getActiveProfileId } from '@/lib/profiles/getActiveProfileId'
 import QuickActions from '@/components/dashboard/QuickActions'
 import DashboardGreeting from '@/components/dashboard/DashboardGreeting'
+import AttentionPanel from '@/components/dashboard/AttentionPanel'
+import ActiveDiagnosesCard, {
+  type DashboardDiagnosis,
+} from '@/components/dashboard/ActiveDiagnosesCard'
+import { buildAttentionItems } from '@/lib/dashboard/attention'
 
 function todayDateString() {
   const now = new Date()
@@ -46,6 +51,7 @@ function formatIndicatorValue(indicator: {
 type NextAppointment = {
   id: string
   date: string
+  time: string | null
   specialty: string | null
   doctors: { name: string } | null
 }
@@ -98,28 +104,35 @@ export default async function DashboardPage() {
     user.email?.split('@')[0] ||
     'Usuario'
 
+  const today = todayDateString()
+
   const [
     { data: nextAppointment },
-    { data: activeMedications, count: activeMedicationsCount },
+    { data: activeMedications },
     { data: recentStudies },
     { data: lastIndicator },
+    { data: userRow },
+    { data: profile },
+    { data: activeDiagnoses },
+    { data: unanalyzedStudies },
+    { data: lastBloodPressure },
   ] = await Promise.all([
     supabase
       .from('appointments')
-      .select('id, date, specialty, doctors ( name )')
+      .select('id, date, time, specialty, doctors ( name )')
       .eq('profile_id', profileId)
       .eq('status', 'programada')
-      .gte('date', todayDateString())
+      .gte('date', today)
       .order('date', { ascending: true })
+      .order('time', { ascending: true })
       .limit(1)
       .maybeSingle(),
     supabase
       .from('medications')
-      .select('name', { count: 'exact' })
+      .select('id, name, quantity_remaining, start_date')
       .eq('profile_id', profileId)
       .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .limit(3),
+      .order('created_at', { ascending: false }),
     supabase
       .from('studies')
       .select('id, name, type, date')
@@ -133,17 +146,59 @@ export default async function DashboardPage() {
       .order('measured_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase.from('users').select('plan').eq('id', user.id).single(),
+    supabase
+      .from('profiles')
+      .select('date_of_birth, blood_type, emergency_contact_name, is_owner')
+      .eq('id', profileId)
+      .maybeSingle(),
+    supabase
+      .from('diagnoses')
+      .select('id, name, description, is_chronic, diagnosed_at')
+      .eq('profile_id', profileId)
+      .eq('is_active', true)
+      .order('diagnosed_at', { ascending: false, nullsFirst: false }),
+    supabase
+      .from('studies')
+      .select('name')
+      .eq('profile_id', profileId)
+      .eq('ai_processed', false)
+      .not('file_url', 'is', null),
+    supabase
+      .from('health_indicators')
+      .select('value_primary, value_secondary, measured_at')
+      .eq('profile_id', profileId)
+      .eq('type', 'presion')
+      .order('measured_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ])
 
   const appointment = nextAppointment as NextAppointment | null
   const studies = (recentStudies as RecentStudy[] | null) ?? []
   const indicator = lastIndicator as LastIndicator | null
-  const medicationNames = (activeMedications ?? []).map((m) => m.name)
-  const medicationCount = activeMedicationsCount ?? 0
+  const medications = activeMedications ?? []
+  const medicationNames = medications.slice(0, 3).map((m) => m.name)
+  const medicationCount = medications.length
+  const diagnoses = (activeDiagnoses as DashboardDiagnosis[] | null) ?? []
+
+  const attentionItems = buildAttentionItems({
+    today,
+    profileHref: profile?.is_owner === false ? '/familia' : '/perfil',
+    isPremium: userRow?.plan === 'premium',
+    profile: profile ?? null,
+    nextAppointment: appointment,
+    medications,
+    diagnoses,
+    unanalyzedStudies: unanalyzedStudies ?? [],
+    lastBloodPressure: lastBloodPressure ?? null,
+  })
 
   return (
     <div className="bg-gray-50 min-h-screen px-4 py-6 md:px-8 md:py-8">
       <DashboardGreeting displayName={displayName} />
+
+      <AttentionPanel items={attentionItems} />
 
       <section className="mb-8">
         <h2 className="text-gray-800 font-semibold mb-3">Acciones rápidas</h2>
@@ -237,6 +292,8 @@ export default async function DashboardPage() {
           )}
         </div>
       </section>
+
+      <ActiveDiagnosesCard diagnoses={diagnoses} />
     </div>
   )
 }
