@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { timeAgo } from '@/lib/dashboard/dates'
+import { timeAgo } from '@/lib/dates'
 
 export type ActivityKind =
   | 'consulta'

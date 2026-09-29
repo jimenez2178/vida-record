@@ -13,7 +13,7 @@ import RecentActivity, {
 } from '@/components/dashboard/RecentActivity'
 import HealthSummaryCard from '@/components/dashboard/HealthSummaryCard'
 import { buildAttentionItems } from '@/lib/dashboard/attention'
-import { formatDate, timeAgo, todayDateString } from '@/lib/dashboard/dates'
+import { formatDate, timeAgo, todayDateString } from '@/lib/dates'
 import {
   formatIndicatorValue,
   indicatorTypeLabels,
@@ -103,6 +103,7 @@ export default async function DashboardPage() {
     { data: lastBloodPressure },
     { data: recentAppointments },
     { data: recentDiagnoses },
+    { data: unconfirmedAppointments },
   ] = await Promise.all([
     supabase
       .from('appointments')
@@ -172,6 +173,12 @@ export default async function DashboardPage() {
       .eq('profile_id', profileId)
       .order('created_at', { ascending: false })
       .limit(5),
+    supabase
+      .from('appointments')
+      .select('specialty')
+      .eq('profile_id', profileId)
+      .eq('status', 'programada')
+      .lt('date', today),
   ])
 
   const isPremium = userRow?.plan === 'premium'
@@ -201,6 +208,7 @@ export default async function DashboardPage() {
     medications,
     diagnoses,
     unanalyzedStudies: unanalyzedStudies ?? [],
+    unconfirmedAppointments: unconfirmedAppointments ?? [],
     lastBloodPressure: lastBloodPressure ?? null,
   })
 

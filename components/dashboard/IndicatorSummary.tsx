@@ -1,5 +1,5 @@
 import Sparkline from '@/components/dashboard/Sparkline'
-import { formatShortDate, timeAgo } from '@/lib/dashboard/dates'
+import { formatShortDate, timeAgo } from '@/lib/dates'
 import {
   classifyIndicator,
   formatIndicatorValue,

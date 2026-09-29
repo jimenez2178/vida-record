@@ -31,6 +31,8 @@ type AttentionInput = {
   }[]
   diagnoses: { name: string; description: string | null }[]
   unanalyzedStudies: { name: string }[]
+  // Consultas programadas cuya fecha ya pasó.
+  unconfirmedAppointments: { specialty: string | null }[]
   lastBloodPressure: {
     value_primary: number | null
     value_secondary: number | null
@@ -85,6 +87,23 @@ export function buildAttentionItems(input: AttentionInput): AttentionItem[] {
         cta: 'Ver cita',
       })
     }
+  }
+
+  const unconfirmed = input.unconfirmedAppointments
+  if (unconfirmed.length > 0) {
+    items.push({
+      id: 'appointments-unconfirmed',
+      level: 'info',
+      title:
+        unconfirmed.length === 1
+          ? '¿Asististe a tu consulta?'
+          : `${unconfirmed.length} consultas pasadas sin confirmar`,
+      detail: `${listNames(
+        unconfirmed.map((a) => a.specialty || 'Consulta médica')
+      )}: siguen como programadas aunque su fecha ya pasó.`,
+      href: '/citas',
+      cta: 'Confirmar',
+    })
   }
 
   const bp = input.lastBloodPressure

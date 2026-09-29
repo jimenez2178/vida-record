@@ -2,7 +2,20 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { todayDateString } from '@/lib/dates'
 import type { Appointment, AppointmentStatus } from './AppointmentCard'
+
+export type AppointmentPrefill = {
+  date?: string
+  specialty?: string
+  doctorName?: string
+  clinicName?: string
+}
+
+// Una consulta nueva con fecha pasada casi siempre es una que ya ocurrió.
+function defaultStatusForDate(date: string): AppointmentStatus {
+  return date && date < todayDateString() ? 'completada' : 'programada'
+}
 
 function isWithinNextDays(dateStr: string, days: number) {
   const today = new Date()
@@ -18,23 +31,33 @@ export default function AppointmentModal({
   profileId,
   userId,
   appointment,
+  prefill,
+  expandDetails = false,
   onClose,
   onSuccess,
 }: {
   profileId: string
   userId: string
   appointment: Appointment | null
+  prefill?: AppointmentPrefill | null
+  expandDetails?: boolean
   onClose: () => void
   onSuccess: () => void
 }) {
   const supabase = createClient()
   const isEditing = Boolean(appointment)
 
-  const [date, setDate] = useState(appointment?.date ?? '')
-  const [time, setTime] = useState(appointment?.time ?? '')
-  const [specialty, setSpecialty] = useState(appointment?.specialty ?? '')
-  const [doctorName, setDoctorName] = useState(appointment?.doctors?.name ?? '')
-  const [clinicName, setClinicName] = useState(appointment?.clinic_name ?? '')
+  const [date, setDate] = useState(appointment?.date ?? prefill?.date ?? '')
+  const [time, setTime] = useState(appointment?.time?.slice(0, 5) ?? '')
+  const [specialty, setSpecialty] = useState(
+    appointment?.specialty ?? prefill?.specialty ?? ''
+  )
+  const [doctorName, setDoctorName] = useState(
+    appointment?.doctors?.name ?? prefill?.doctorName ?? ''
+  )
+  const [clinicName, setClinicName] = useState(
+    appointment?.clinic_name ?? prefill?.clinicName ?? ''
+  )
   const [reason, setReason] = useState(appointment?.reason ?? '')
   const [diagnosis, setDiagnosis] = useState(appointment?.diagnosis ?? '')
   const [notes, setNotes] = useState(appointment?.notes ?? '')
@@ -42,11 +65,28 @@ export default function AppointmentModal({
     appointment?.next_appointment_date ?? ''
   )
   const [status, setStatus] = useState<AppointmentStatus>(
-    appointment?.status ?? 'programada'
+    appointment?.status ?? defaultStatusForDate(prefill?.date ?? '')
   )
+  const [statusTouched, setStatusTouched] = useState(isEditing)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [showMoreOptions, setShowMoreOptions] = useState(false)
+  // Al editar, abre las opciones si ya tienen datos para no esconderlos.
+  const [showMoreOptions, setShowMoreOptions] = useState(
+    expandDetails ||
+      Boolean(
+        appointment &&
+          (appointment.clinic_name ||
+            appointment.reason ||
+            appointment.diagnosis ||
+            appointment.notes ||
+            appointment.next_appointment_date)
+      )
+  )
+
+  const handleDateChange = (value: string) => {
+    setDate(value)
+    if (!statusTouched) setStatus(defaultStatusForDate(value))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -202,21 +242,38 @@ export default function AppointmentModal({
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="date"
-                className="block text-base font-semibold text-gray-700 mb-1.5"
-              >
-                Fecha
-              </label>
-              <input
-                id="date"
-                type="date"
-                required
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4">
+              <div>
+                <label
+                  htmlFor="date"
+                  className="block text-base font-semibold text-gray-700 mb-1.5"
+                >
+                  Fecha
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  required
+                  value={date}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="time"
+                  className="block text-base font-semibold text-gray-700 mb-1.5"
+                >
+                  Hora <span className="font-normal text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  id="time"
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full sm:w-40 min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
+                />
+              </div>
             </div>
 
             <div>
@@ -246,7 +303,10 @@ export default function AppointmentModal({
               <select
                 id="status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
+                onChange={(e) => {
+                  setStatus(e.target.value as AppointmentStatus)
+                  setStatusTouched(true)
+                }}
                 className="w-full min-h-[52px] rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-lg text-gray-900"
               >
                 <option value="programada">Programada</option>
@@ -281,22 +341,6 @@ export default function AppointmentModal({
 
             {showMoreOptions && (
               <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="time"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Hora
-                  </label>
-                  <input
-                    id="time"
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 px-3 py-2 text-sm text-gray-900"
-                  />
-                </div>
-
                 <div>
                   <label
                     htmlFor="clinicName"
