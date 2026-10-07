@@ -1,0 +1,23 @@
+name: Mantener activo Supabase
+
+on:
+  schedule:
+    # Cada 3 días a las 12:00 UTC; evita que Supabase pause el proyecto por inactividad
+    - cron: '0 12 */3 * *'
+  workflow_dispatch: {}
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consulta simple a Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/rest/v1/profiles?select=id&limit=1" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -o /dev/null
+          echo "Supabase respondió correctamente"
