@@ -6,6 +6,7 @@ import NavbarTop from '@/components/layout/NavbarTop'
 import MobileNav from '@/components/layout/MobileNav'
 import Logo from '@/components/ui/Logo'
 import InstallPWA from '@/components/pwa/InstallPWA'
+import { InstallMenuItem } from '@/components/pwa/InstallGuide'
 import PremiumTopBanner from '@/components/ui/PremiumTopBanner'
 import AssistantFab from '@/components/layout/AssistantFab'
 
@@ -260,6 +261,8 @@ export default async function DashboardLayout({
         />
 
         <div className="px-3 py-4 border-t border-blue-800">
+          <InstallMenuItem />
+
           <Link
             href="/configuracion"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/90 hover:bg-blue-800 transition-colors mb-1"

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Logo from '@/components/ui/Logo'
 import SidebarNav from '@/components/layout/SidebarNav'
-import InstallGuideButton from '@/components/pwa/InstallGuide'
+import { InstallMenuItem } from '@/components/pwa/InstallGuide'
 
 type NavLink = {
   href: string
@@ -145,7 +145,7 @@ export default function MobileNav({
         )}
 
         <div className="px-3 py-4 border-t border-blue-800">
-          <InstallGuideButton className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/90 hover:bg-blue-800 transition-colors mb-1" />
+          <InstallMenuItem />
 
           <Link
             href="/configuracion"
