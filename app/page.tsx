@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
+import InstallGuideButton from '@/components/pwa/InstallGuide'
 import {
   AccessibilityBar,
   SiteHeader,
@@ -175,6 +176,10 @@ export default function Home() {
                   español
                 </span>
               </div>
+
+              <InstallGuideButton className="text-sm font-semibold text-white underline underline-offset-4 decoration-teal-300 hover:text-teal-200 transition-colors">
+                📱 ¿Cómo instalo la app en mi celular?
+              </InstallGuideButton>
             </div>
 
             <div className="flex justify-center lg:justify-end">
